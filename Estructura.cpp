@@ -20,10 +20,6 @@ using namespace std;
 const int MAX_CHILDREN = 4;
 const int MIN_CHILDREN = 2;
 
-struct Point {
-    double x, y;
-    Point(double x = 0, double y = 0) : x(x), y(y) {} // Constructor
-};
 
 struct Rectangle { // Rectangulo con esquinas inferiores izquierda y superior derecha
     // Coordenadas de la esquina inferior izquierda del rectangulo (x1, y1)
@@ -52,7 +48,6 @@ struct Node {
     bool is_leaf;
     Rectangle rect;
     vector<Node*> children;
-    vector<Point> points;
     Node(bool is_leaf = false) : is_leaf(is_leaf) {}
     ~Node() {
         for (Node* child : children) {
@@ -66,13 +61,7 @@ struct Node {
         rect.x2 = max(rect.x2, child->rect.x2);
         rect.y2 = max(rect.y2, child->rect.y2);
     }
-    void add_point(const Point& p) {
-        points.push_back(p);
-        rect.x1 = min(rect.x1, p.x);
-        rect.y1 = min(rect.y1, p.y);
-        rect.x2 = max(rect.x2, p.x);
-        rect.y2 = max(rect.y2, p.y);
-    }
+
     bool is_full() const {
         return children.size() == MAX_CHILDREN;
     }
@@ -87,41 +76,22 @@ public:
     ~RTree() { // Destructor
         delete root;
     }
-    void insert(const Point& p) { // Inserta un punto en el RTree   
+    //Inserta rectángulos al R-tree, almacenandolo en un nodo, y agregándolo al arbol como hijo
+    void insert(const Rectangle& rect) {
         if (root == nullptr) {
             root = new Node(true);
-            root->add_point(p);
+            root->add_child(new Node(rect, true));
             return;
         }
-        Node* leaf = choose_leaf(root, p);
-        leaf->add_point(p);
-        if (leaf->is_full()) { // Si la hoja esta llena, se divide
-            Node* split_node = split_leaf(leaf);
-            adjust_tree(leaf, split_node);
+        Node* leaf = choose_leaf(root, rect);
+        leaf->add_child(new Node(rect, true));
+        if (leaf->is_full()) {
+            Node* new_leaf = split_leaf(leaf);
+            adjust_tree(leaf, new_leaf);
         }
     }
-    void remove(const Point& p) { // Elimina un punto del RTree
-        if (root == nullptr) {
-            return;
-        }
-        Node* leaf = find_leaf(root, p); // Busca la hoja que contiene el punto
-        if (leaf == nullptr) {
-            return;
-        }
-        auto it = find(leaf->points.begin(), leaf->points.end(), p); // Elimina el punto de la hoja
-        if (it != leaf->points.end()) {
-            leaf->points.erase(it);
-            condense_tree(leaf);
-        }
-    }
-    vector<Point> search(const Rectangle& rect) const { // Busca todos los puntos dentro de un rectangulo
-        vector<Point> result;
-        if (root == nullptr) {
-            return result;
-        }
-        search(root, rect, result);
-        return result;
-    }
+
+
 private:
     Node* root;
     Node* choose_leaf(Node* node, const Point& p) {
