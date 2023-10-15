@@ -1,97 +1,82 @@
-#include <'Estructura.hpp'>
+#include "algoritmo1.hpp"
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <cmath>
 #include <string>
+#include <cmath>
+#include<algorithm>
+#include<random>
+#include<chrono>
 #include <fstream>
-#include <sstream>
-#include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <random>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
 using namespace std;
 
-//Función para generar números aleatorios
-int random(int min, int max) {
-    return rand() % (max - min + 1) + min;
-}
+string print(vector<unsigned int> arr){
+    string res;
+    for (unsigned int i=0;i<arr.size();i++){
+            res+= to_string(arr[i])+" ";
+        }
 
-//Función para generar números aleatorios con distribución normal
-int random_normal(int min, int max) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<> d(min, max);
-    return d(gen);
+    return res;
 }
-
-//Función para generar un par de rectángulos aleatorios
-vector<Rectangle> random_rectangles(int min, int max) {
+vector<Rectangle> createRandomRectangles(int n){
     vector<Rectangle> rects;
-    for (int i = 0; i < 2; i++) {
+    random_device rd;
+    mt19937 gen(rd());
+    //Valores aleatorios entre 0 y 500mil
+    uniform_int_distribution<> distr1(0, 500000);
+    //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 100
+    uniform_int_distribution<> distr2(0, 100);
+
+    int j = pow(2,n); // Número de rectángulos
+    for (int i=0; i<n; i++){
+        int x1 = distr1(gen);
+        int y1 = distr1(gen);
+        int x2 = x1 + distr2(gen);
+        int y2 = y1 + distr2(gen);
         Rectangle rect;
-        rect.x1 = random(min, max);
-        rect.y1 = random(min, max);
-        rect.x2 = random(rect.x1, max);
-        rect.y2 = random(rect.y1, max);
+        rect.x1 = x1;
+        rect.y1 = y1;
+        rect.x2 = x2;
+        rect.y2 = y2;
+        
         rects.push_back(rect);
     }
-    return rects;
-}
-//Función para generar un par de rectángulos aleatorios con distribución normal
-vector<Rectangle> random_rectangles_normal(int min, int max) {
-    vector<Rectangle> rects;
-    for (int i = 0; i < 2; i++) {
-        Rectangle rect;
-        rect.x1 = random_normal(min, max);
-        rect.y1 = random_normal(min, max);
-        rect.x2 = random_normal(rect.x1, max);
-        rect.y2 = random_normal(rect.y1, max);
-        rects.push_back(rect);
-    }
-    return rects;
+    
 }
 
-//Main para generar y graficar los rectángulos aleatorios
-int main() {
-    //Generación de los rectángulos aleatorios
-    vector<Rectangle> rects = random_rectangles(0, 100);
-    //Impresión de los rectángulos aleatorios
-    cout << "Rectángulos aleatorios: " << endl;
-    for (int i = 0; i < rects.size(); i++) {
-        cout << "Rectángulo " << i << ": " << endl;
-        cout << "x1: " << rects[i].x1 << endl;
-        cout << "y1: " << rects[i].y1 << endl;
-        cout << "x2: " << rects[i].x2 << endl;
-        cout << "y2: " << rects[i].y2 << endl;
+void test1(){
+
+}
+void test2(){
+    ofstream archivo("resultados.txt");
+    if (archivo.is_open()){
+        //Encabezado del archivo
+        archivo << "Algoritmo 1, Potencia de N, Tiempo de ejecución" << endl;
+        //Cuerpo del archivo (se testea desde n=2^10 hasta 2^25)
+        // for (int i=10; i<=25; i++){
+        //     int n = pow(2,i);
+        //     vector<unsigned int> input(n,0);
+        //     for (int j=0; j<n; j++){
+        //         input[j] = j+1;
+        //     }
+        //     auto start = chrono::steady_clock::now();
+        //     makeGroups(input, 2);
+        //     auto end = chrono::steady_clock::now();
+        //     auto diff = end - start;
+        //     archivo << "Algoritmo 1, " << n << ", " << chrono::duration <double, milli> (diff).count() << endl;
+        // }
+
+
+
+
+
+
     }
-    //Generación de los rectángulos aleatorios con distribución normal
-    vector<Rectangle> rects_normal = random_rectangles_normal(0, 100);
-    //Impresión de los rectángulos aleatorios con distribución normal
-    cout << "Rectángulos aleatorios con distribución normal: " << endl;
-    for (int i = 0; i < rects_normal.size(); i++) {
-        cout << "Rectángulo " << i << ": " << endl;
-        cout << "x1: " << rects_normal[i].x1 << endl;
-        cout << "y1: " << rects_normal[i].y1 << endl;
-        cout << "x2: " << rects_normal[i].x2 << endl;
-        cout << "y2: " << rects_normal[i].y2 << endl;
-    }
-    //Generación de los rectángulos aleatorios con distribución normal
-    vector<Rectangle> rects_normal2 = random_rectangles_normal(0, 100);
-    //Impresión de los rectángulos aleatorios con distribución normal
-    cout << "Rectángulos aleatorios con distribución normal: " << endl;
-    for (int i = 0; i < rects_normal2.size(); i++) {
-        cout << "Rectángulo " << i << ": " << endl;
-        cout << "x1: " << rects_normal2[i].x1 << endl;
-        cout << "y1: " << rects_normal2[i].y1 << endl;
-        cout << "x2: " << rects_normal2[i].x2 << endl;
-        cout << "y2: " << rects_normal2[i].y2 << endl;
-    }
+    archivo.close();
+
+}   
+
+int main(){
+    test1();
+    test2();
     return 0;
 }
