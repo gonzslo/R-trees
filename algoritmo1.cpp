@@ -3,6 +3,7 @@
 #include <ostream>
 #include <algorithm>
 #include <random>
+#include <math.h>
 using namespace std;
 
 //Se crea estructura para los rectángulos
@@ -37,15 +38,13 @@ void ordenarRectangulosX(vector<Rectangle> &rects){
 //Contienen un vector de nodos hijos y un vector de rectángulos
 struct Node {
     bool isLeaf;
-    Rectangle rect;
+    Rectangle MBR;
     vector<Node*> children;
-    vector<Rectangle> rects;
-
 };
 //Función que recibe un rectángulo y lo hace un nodo
-Node* makeNode(Rectangle rect) {
+Node* makeLeaf(Rectangle rect) {
     Node* node = new Node;
-    node->rect = rect;
+    node->MBR = rect;
     node->isLeaf = true;
     return node;
 }
@@ -55,18 +54,19 @@ Node* makeParent(vector<Node*> children) {
     node->isLeaf = false;
     node->children = children;
     //Se calcula el rectángulo que contiene a todos los hijos
-    int x1 = children[0]->rect.x1;
-    int y1 = children[0]->rect.y1;
-    int x2 = children[-1]->rect.x2;
-    int y2 = children[-1]->rect.y2;
+    int x1 = children[0]->MBR.x1;
+    int y1 = children[0]->MBR.y1;
+    int x2 = children[children.size() -1]->MBR.x2;
+    int y2 = children[children.size() -1]->MBR.y2;
     Rectangle rect = {x1, y1, x2, y2};
-    node->rect = rect;
+    node->MBR = rect;
     return node;
 }
 //Estructura R-tree
 struct RTree {
     Node* root;
     int M;
+    vector<Node*> hijos;
 };
 //Función que recibe un vector de rectángulos y un entero M, y crea un R-tree
 RTree* makeRTree(vector<Rectangle> rects, int M) {
@@ -78,33 +78,25 @@ RTree* makeRTree(vector<Rectangle> rects, int M) {
     vector<Node*> leafs;
     for (int i = 0; i < rects.size(); i++) {
         //Se crea un nodo hoja por cada rectángulo
-        Node* node = makeNode(rects[i]);
+        Node* node = makeLeaf(rects[i]);
         //Se agrega el nodo hoja al vector de nodos hoja
         leafs.push_back(node);
     }
-    //Se crea un vector de nodos
-    vector<Node*> nodes;
-    //Se crea un nodo padre
-    Node* parent;
-    //Se crea un vector de nodos hijos
-    vector<Node*> children;
-    //Se crea un rectángulo que contiene a todos los rectángulos
-    Rectangle rect = {leafs[0]->rect.x1, leafs[0]->rect.y1, leafs[-1]->rect.x2, leafs[-1]->rect.y2};
-    //Se crea un nodo padre con el rectángulo que contiene a todos los rectángulos
-    parent = makeNode(rect);
-    //Se agrega el nodo padre al vector de nodos
-    nodes.push_back(parent);
-    //Se agrega el nodo padre al vector de nodos hijos
-    children.push_back(parent);
-    //Se agrega el primer nodo hoja al vector de nodos hijos
-    children.push_back(leafs[0]);
-    //Se agrega el segundo nodo hoja al vector de nodos hijos
-    children.push_back(leafs[1]);
-    //Se crea un nodo padre con los nodos hijos
-    parent = makeParent(children);
-    //Se agrega el nodo padre al vector de nodos
-    nodes.push_back(parent);
-    //Se agrega el nodo padre al vector de nodos hijos
-    children.push_back(parent);
-    //Se agrega el tercer nodo hoja al vector de nodos hijos
-    children.push_back(leafs[2]);
+
+    int ciclos = ceil(log10(leafs.size())/log10(M));
+    for (int i = 0; i < ciclos; i++){
+        //Se crea un vector de nodos
+        for (int j = 0; j < leafs.size(); j++){
+            for (int k=0; k<M; k++){
+                vector<Node*> node;
+                Node* primero = leafs[0];
+                leafs = leafs.erase(leafs.begin());
+                node[k] = primero;
+
+
+            }
+        }
+        
+        
+    }
+}
