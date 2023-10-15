@@ -37,7 +37,7 @@ vector<Rectangle> createRandomRectangles(int n){
         rect.y1 = y1;
         rect.x2 = x2;
         rect.y2 = y2;
-        
+
         rects.push_back(rect);
     }
     
@@ -47,25 +47,12 @@ void test1(){
 
 }
 void test2(){
-    ofstream archivo("resultados.txt");
+    ofstream archivo("resultados.bin");
     if (archivo.is_open()){
         //Encabezado del archivo
         archivo << "Algoritmo 1, Potencia de N, Tiempo de ejecución" << endl;
         //Cuerpo del archivo (se testea desde n=2^10 hasta 2^25)
-        // for (int i=10; i<=25; i++){
-        //     int n = pow(2,i);
-        //     vector<unsigned int> input(n,0);
-        //     for (int j=0; j<n; j++){
-        //         input[j] = j+1;
-        //     }
-        //     auto start = chrono::steady_clock::now();
-        //     makeGroups(input, 2);
-        //     auto end = chrono::steady_clock::now();
-        //     auto diff = end - start;
-        //     archivo << "Algoritmo 1, " << n << ", " << chrono::duration <double, milli> (diff).count() << endl;
-        // }
-
-
+        //TODO: Se generan los rectángulos
 
 
 
@@ -74,9 +61,14 @@ void test2(){
     archivo.close();
 
 }   
+void test3(){
+    
+
+}
 
 int main(){
-    test1();
-    test2();
+    // test1();
+    // test2();
+    test3();
     return 0;
 }

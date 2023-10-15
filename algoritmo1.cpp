@@ -7,27 +7,6 @@
 #include "algoritmo1.hpp"
 using namespace std;
 
-// Se crea estructura para los rectángulos
-struct Rectangle{
-    // Coordenadas de la esquina inferior izquierda
-    int x1, y1;
-    // Coordenadas de la esquina superior derecha
-    int x2, y2;
-
-    // Se crea método para calcular el área de un rectángulo
-    int area(){
-        return abs(x2 - x1) * abs(y2 - y1);
-    }
-    int distX(){
-        return abs(x2 - x1);
-    }
-    int distY(){
-        return abs(y2 - y1);
-    }
-    float centerX(){
-        return (x1 + x2) / 2.0f;
-    }
-};
 
 // Se crea función que recibe un vector de rectángulos y los ordena según la coordenada X del centro del rectángulo
 void ordenarRectangulosX(vector<Rectangle> &rects){
@@ -37,13 +16,7 @@ void ordenarRectangulosX(vector<Rectangle> &rects){
         return mean_a < mean_b; });
 }
 
-// Definimos los nodos, que son los rectángulos que se encuentran en el árbol
-// Contienen un vector de nodos hijos y un vector de rectángulos
-struct Node{
-    bool isLeaf;
-    Rectangle MBR;
-    vector<Node *> children;
-};
+
 // Función que recibe un rectángulo y lo hace un nodo
 Node *makeLeaf(Rectangle rect){
     Node *node = new Node;
@@ -81,52 +54,6 @@ Node *makeParent(vector<Node *> children){
     node->MBR = rect;
     return node;
 }
-// Estructura R-tree
-struct RTree{
-    Node *root;
-    int M;
-    vector<Node *> hijos;
-    // Búsqueda: retorna un vector de rectangulos que intersectan con value
-    std::vector<Rectangle> search(const Rectangle& value) {
-        std::vector<Rectangle> result;
-        searchRecursive(root, value, result);
-        return result;
-    }
-};
-bool intersects(const Rectangle& rect1, const Rectangle& rect2) {
-    // Verifica si dos rectángulos se intersectan.
-    bool x_overlap = (rect1.x1 <= rect2.x2 && rect1.x2 >= rect2.x1) || (rect2.x1 <= rect1.x2 && rect2.x2 >= rect1.x1);
-    bool y_overlap = (rect1.y1 <= rect2.y2 && rect1.y2 >= rect2.y1) || (rect2.y1 <= rect1.y2 && rect2.y2 >= rect1.y1);
-
-    return x_overlap && y_overlap;
-}
-void searchRecursive(Node* currentNode, const Rectangle& value, std::vector<Rectangle>& result) {
-    if(currentNode == nullptr)
-        return;
-    if(currentNode->isLeaf) {
-        if (intersects(currentNode->MBR, value)) {
-            result.push_back(currentNode->MBR);
-        }
-    } else {
-        for (Node* child : currentNode->children) {
-            if(intersects(child->MBR, value)) {
-                searchRecursive(child, value, result);
-            }
-        }
-    }
-}
-
-/*bool doRectanglesIntersect(const Rectangle& rect1, const Rectangle& rect2) {
-    // Verifica si los rectángulos no se superponen
-    if (rect1.x1 > rect2.x2 || // rect1 está a la derecha de rect2
-        rect2.x1 > rect1.x2 || // rect1 está a la izquierda de rect2
-        rect1.y1 > rect2.y2 || // rect1 está arriba de rect2
-        rect2.y1 > rect1.y2) { // rect1 está abajo de rect2
-        return false;
-    }
-    // Si no se cumple la condición anterior, los rectángulos se superponen
-    return true;
-}*/
 
 // Función que crea hojas a partir de un vector de rectángulos que primero ordena
 vector<Node *> makeLeaves(vector<Rectangle> rects){
@@ -262,7 +189,52 @@ void test2(){
             cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 << endl;
     }
 }
+
+//Main que genera aleatoriamente 6 rectángulos en un plano de 20x20 y los agrupa en un R-tree
+//utiliza include random
 int main(){
-    test2();
+    random_device rd;
+    mt19937 eng(rd());
+    uniform_int_distribution<> distr(0, 20);
+    //Se crea un vector de rectángulos
+    vector<Rectangle> rects;
+    //Se crean 6 rectángulos aleatorios
+    for (int i = 0; i < 7; i++) {
+        int a = distr(eng);
+        int b = distr(eng);
+        int c = distr(eng);
+        int d = distr(eng);
+        int x1 = min(a, c);
+        int x2 = max(a, c);
+        int y1 = min(b, d);
+        int y2 = max(b, d);
+        Rectangle rect = {x1, y1, x2, y2};
+        rects.push_back(rect);
+        cout << "Rectangulo " << i+1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
+
+    }
+    // Se hacen las hojas
+    vector<Node*> leaves = makeLeaves(rects);
+    for (int i=0; i<7; i++) {
+        cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
+    }
+    //Se crea el R-tree
+    RTree rtree = makeGroups(leaves, 3);
+    //Impresión de los nodos hoja
+    cout << "Nodos hoja: " << endl;
+
+    cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 <<endl;
+
+    //Se crea un rectángulo para buscar
+    Rectangle rect = {0, 0, 10, 10}; //Cuadrado de 10x10 centrado en (5,5)
+    //Se busca el rectángulo
+    vector<Rectangle> result = rtree.search(rect);
+    //Se imprime el rectangulo
+    cout << "Rectangulo a buscar: " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
+    //Se imprime el resultado
+    cout << "Resultado: " << endl;
+    for (int i=0; i<result.size(); i++) {
+        cout << "Rectangulo " << i+1 << ": " << result[i].x1 << ", " << result[i].x2 << " " << result[i].y1 << ", " << result[i].y2 << endl;
+    }
     return 0;
 }
