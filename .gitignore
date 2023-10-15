@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 .vscode/settings.json
 .vscode/tasks.json
+main.py
