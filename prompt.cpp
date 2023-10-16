@@ -128,8 +128,13 @@ RTree nearestX(vector<Rectangle> rects, int M){
     return rtree;
 }
 
+//Se dejan 16 strings para nombrar los archivos de los 16 árboles
+vector<string> RTreeFile = {"rtree1.bin", "rtree2.bin", "rtree3.bin", "rtree4.bin", "rtree5.bin",
+                            "rtree6.bin", "rtree7.bin", "rtree8.bin", "rtree9.bin", "rtree10.bin",
+                            "rtree11.bin", "rtree12.bin", "rtree13.bin", "rtree14.bin", "rtree15.bin",
+                            "rtree16.bin"};
 
-const string RTreeFile = "rtree.bin";
+
 int lastBlock = 0;
 
 void saveNodeToFile(Node *node, ofstream &out) {
@@ -139,8 +144,8 @@ void saveNodeToFile(Node *node, ofstream &out) {
     }
 }
 
-void saveRTreeToFile(RTree &tree) {
-    ofstream out(RTreeFile, ios::binary);
+void saveRTreeToFile(RTree &tree, int i) {
+    ofstream out(RTreeFile[i], ios::binary);
     lastBlock = 0;
     saveNodeToFile(tree.root, out);
     out.close();
@@ -156,8 +161,8 @@ Node* readNodeFromFile(ifstream &in, int &diskAccesses) {
     return node;
 }
 
-RTree readRTreeFromFile(int &diskAccesses) {
-    ifstream in(RTreeFile, ios::binary);
+RTree readRTreeFromFile(int &diskAccesses, int i) {
+    ifstream in(RTreeFile[i], ios::binary);
     RTree tree;
     tree.root = readNodeFromFile(in, diskAccesses);
     in.close();
@@ -206,20 +211,21 @@ vector<Rectangle> createRandomRectangles(int n){
 }    
 
 int main(){
-    // Se crea un vector de rectángulos
-    vector<Rectangle> rects = createRandomRectangles(15);
-    // Se hace el R-tree
-    RTree rtree = nearestX(rects, 4096);
-    // Se guarda el R-tree en disco
-    saveRTreeToFile(rtree);
-    // Se lee el R-tree desde disco
-    int diskAccesses = 0;
-    RTree rtree2 = readRTreeFromFile(diskAccesses);
-    // Se imprime el R-tree
-    cout << "Nodo raíz: " << rtree2.root->MBR.x1 << ", " << rtree2.root->MBR.x2 << endl;
-    cout << "Número de accesos a disco: " << diskAccesses << endl;
-
-
+    //Creamos 16 árboles con diferentes cantidades de rectángulos
+    for (int i=0; i<16; i++){
+        //Se crea un vector de rectángulos
+        vector<Rectangle> rects = createRandomRectangles(i+1);
+        //Se crea el R-tree
+        RTree rtree = nearestX(rects, 4096);
+        //Se guarda el R-tree en un archivo binario
+        saveRTreeToFile(rtree, i);
+    }
+    //Se leen los árboles desde los archivos binarios
+    for (int i=0; i<16; i++){
+        int diskAccesses = 0;
+        RTree rtree = readRTreeFromFile(diskAccesses, i);
+        cout << "Accesos a disco: " << diskAccesses << endl;
+    }
     
     return 0;
 }
