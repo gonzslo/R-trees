@@ -19,23 +19,20 @@ using namespace std;
 // Tenemos n puntos en el plano (rectangulo tal que x1=x2 e y1=y2)
 // y queremos encontrar el rectángulo de área mínima que los contiene a todos.
 
-/* Paso 1: ordenar los puntos según la coordenada X
- * Podemos reutilizar la funcion ordenarRectangulosX sin necesidad de calcular el promedio
- * de las coordenadas X de cada rectangulo, ya que en este caso x1=x2 */
+// Ordena rectangulos/puntos segun su coordenada X
 void ordenarRectangulosX(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
         float mean_a = (a.x1 + a.x2) / 2.0f;
         float mean_b = (b.x1 + b.x2) / 2.0f;
         return mean_a < mean_b; });
 }
+// Ordena rectangulos/puntos segun su coordenada Y
 void ordenarRectangulosY(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
         float mean_a = (a.y1 + a.y2) / 2.0f;
         float mean_b = (b.y1 + b.y2) / 2.0f;
         return mean_a < mean_b; });
 }
-
-/* Paso 2: Dividir el resultado en sqrt(n/M) grupos*/
 
 // Función que recibe un rectángulo y lo hace un nodo
 Node *makeLeaf(Rectangle rect){
@@ -98,6 +95,7 @@ vector<Node *> makeLeavesY(vector<Rectangle> rects){
     return leaves;
 }
 
+// Función que convierte un vector de nodos en un vector de puntos tomando su MBR
 vector<Rectangle> makePoints(vector<Node *> leaves){
     vector<Rectangle> rectangles;
     for (int i = 0; i < leaves.size(); i++){
@@ -126,7 +124,6 @@ vector<vector<Rectangle>> makeXGroups(vector<Rectangle> points, int M){
 }
 
 // Función que recibe un vector vectores de puntos y hace sqrt(n/M) grupos de tamaño M
-// Estos si son nodos
 vector<Node *> makeYGroups(vector<vector<Rectangle>> XGroups, int M){
     vector<Node *> grupo; // este grupo es vector de nodos
     for (int i = 0; i < XGroups.size(); i++){ // hay que crear un rectangulo que contenga los puntos
