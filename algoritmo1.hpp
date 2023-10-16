@@ -34,6 +34,13 @@ struct Node{
     bool isLeaf;
     Rectangle MBR;
     vector<Node *> children;
+    bool intersects(const Rectangle& rect1, const Rectangle& rect2) {
+        // Verifica si dos rectángulos se intersectan.
+        bool x_overlap = (rect1.x1 <= rect2.x2 && rect1.x2 >= rect2.x1) || (rect2.x1 <= rect1.x2 && rect2.x2 >= rect1.x1);
+        bool y_overlap = (rect1.y1 <= rect2.y2 && rect1.y2 >= rect2.y1) || (rect2.y1 <= rect1.y2 && rect2.y2 >= rect1.y1);
+
+        return x_overlap && y_overlap;
+    }
 };
 
 // Estructura R-Tree
