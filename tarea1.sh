@@ -1,1 +1,3 @@
-g++ Estructura.cpp Tests.cpp -o tarea1.out
+ g++ algoritmo1.cpp  Tests.cpp -o tarea1.out
+
+ ./tarea1.out

@@ -16,7 +16,6 @@ void ordenarRectangulosX(vector<Rectangle> &rects){
         return mean_a < mean_b; });
 }
 
-
 // Función que recibe un rectángulo y lo hace un nodo
 Node *makeLeaf(Rectangle rect){
     Node *node = new Node;
@@ -24,6 +23,7 @@ Node *makeLeaf(Rectangle rect){
     node->isLeaf = true;
     return node;
 }
+
 // Función que agrupa M nodos en un nodo padre
 Node *makeParent(vector<Node *> children){
     Node *node = new Node;
@@ -65,6 +65,7 @@ vector<Node *> makeLeaves(vector<Rectangle> rects){
     }
     return leaves;
 }
+
 // Función que recibe un vector de nodos y hace grupos
 RTree makeGroups(vector<Node *> children, int M){
     vector<Node *> grupo; //
@@ -104,137 +105,139 @@ RTree nearestX(vector<Rectangle> rects, int M){
     return rtree;
 }
 
-void test(){
-    int e = 10; //exponente
-    while (e <= 25){   // genera aleatoriamente n rectángulos en un plano de 500mil x 500mil y los agrupa en un R-tree
-        random_device rd;
-        mt19937 eng(rd());
-        uniform_int_distribution<> distr1(0, 500000);
-        uniform_int_distribution<> distr2(0, 100);
-        // Se crea un vector de rectángulos
-        vector<Rectangle> rects;
-        // Se crean 6 rectángulos aleatorios
-        int n = pow(2,e); // Número de rectángulos
-        int M = 3; // Máximo número de hijos por nodo
-        for (int i = 0; i < n; i++){
-            int a = distr1(eng);
-            int b = distr2(eng);
-            int c = distr1(eng);
-            int d = distr2(eng);
-            int x1 = a;
-            int x2 = a + b;
-            if (a + b > 500000){
-                int x2 = 500000;
-            }
-            int y1 = c;
-            int y2 = c + d;
-            if (c + d > 500000){
-                int y2 = 500000;
-            }
-            Rectangle rect = {x1, y1, x2, y2};
-            rects.push_back(rect);
-            cout << "Rectangulo " << i + 1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
-        }
-        // Se hacen las hojas
-        vector<Node *> leaves = makeLeaves(rects);
-        for (int i = 0; i < n; i++){
-            cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
-        }
-        // Se crea el R-tree
-        RTree rtree = makeGroups(leaves, M);
-        // Impresión de los nodos hoja
-        cout << "Nodos hoja: " << endl;
+// void test(){
+//     int e = 10; //exponente
+//     while (e <= 25){   // genera aleatoriamente n rectángulos en un plano de 500mil x 500mil y los agrupa en un R-tree
+//         random_device rd;
+//         mt19937 eng(rd());
+//         uniform_int_distribution<> distr1(0, 500000);
+//         uniform_int_distribution<> distr2(0, 100);
+//         // Se crea un vector de rectángulos
+//         vector<Rectangle> rects;
+//         // Se crean 6 rectángulos aleatorios
+//         int n = pow(2,e); // Número de rectángulos
+//         int M = 3; // Máximo número de hijos por nodo
+//         for (int i = 0; i < n; i++){
+//             int a = distr1(eng);
+//             int b = distr2(eng);
+//             int c = distr1(eng);
+//             int d = distr2(eng);
+//             int x1 = a;
+//             int x2 = a + b;
+//             if (a + b > 500000){
+//                 int x2 = 500000;
+//             }
+//             int y1 = c;
+//             int y2 = c + d;
+//             if (c + d > 500000){
+//                 int y2 = 500000;
+//             }
+//             Rectangle rect = {x1, y1, x2, y2};
+//             rects.push_back(rect);
+//             cout << "Rectangulo " << i + 1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
+//         }
+//         // Se hacen las hojas
+//         vector<Node *> leaves = makeLeaves(rects);
+//         for (int i = 0; i < n; i++){
+//             cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
+//         }
+//         // Se crea el R-tree
+//         RTree rtree = makeGroups(leaves, M);
+//         // Impresión de los nodos hoja
+//         cout << "Nodos hoja: " << endl;
 
-        cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 << endl;
-        e++;
-    }
-}
+//         cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 << endl;
+//         e++;
+//     }
+// }
 
-void test2(){
-    random_device rd;
-    mt19937 eng(rd());
-    uniform_int_distribution<> distr1(0, 20);
-    uniform_int_distribution<> distr2(0, 10);
+// void test2(){
+//     random_device rd;
+//     mt19937 eng(rd());
+//     uniform_int_distribution<> distr1(0, 20);
+//     uniform_int_distribution<> distr2(0, 10);
 
-    vector<Rectangle> rects;
+//     vector<Rectangle> rects;
 
-    for (int i = 0; i < 10; i++){
-            int a = distr1(eng);
-            int b = distr2(eng);
-            int c = distr1(eng);
-            int d = distr2(eng);
-            int x1 = a;
-            int x2 = a + b;
-            if (a + b > 30){
-                int x2 = 30;
-            }
-            int y1 = c;
-            int y2 = c + d;
-            if (c + d > 30){
-                int y2 = 30;
-            }
-            Rectangle rect = {x1, y1, x2, y2};
-            rects.push_back(rect);
-            cout << "Rectangulo " << i + 1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
+//     for (int i = 0; i < 10; i++){
+//             int a = distr1(eng);
+//             int b = distr2(eng);
+//             int c = distr1(eng);
+//             int d = distr2(eng);
+//             int x1 = a;
+//             int x2 = a + b;
+//             if (a + b > 30){
+//                 int x2 = 30;
+//             }
+//             int y1 = c;
+//             int y2 = c + d;
+//             if (c + d > 30){
+//                 int y2 = 30;
+//             }
+//             Rectangle rect = {x1, y1, x2, y2};
+//             rects.push_back(rect);
+//             cout << "Rectangulo " << i + 1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
 
-            vector<Node *> leaves = makeLeaves(rects);
-            for (int i = 0; i < 10; i++){
-                cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
-            }
-            // Se crea el R-tree
-            RTree rtree = makeGroups(leaves, 3);
-            // Impresión de los nodos hoja
-            cout << "Nodos hoja: " << endl;
+//             vector<Node *> leaves = makeLeaves(rects);
+//             for (int i = 0; i < 10; i++){
+//                 cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
+//             }
+//             // Se crea el R-tree
+//             RTree rtree = makeGroups(leaves, 3);
+//             // Impresión de los nodos hoja
+//             cout << "Nodos hoja: " << endl;
 
-            cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 << endl;
-    }
-}
+//             cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 << endl;
+//     }
+// }
 
-//Main que genera aleatoriamente 6 rectángulos en un plano de 20x20 y los agrupa en un R-tree
-//utiliza include random
-int main(){
-    random_device rd;
-    mt19937 eng(rd());
-    uniform_int_distribution<> distr(0, 20);
-    //Se crea un vector de rectángulos
-    vector<Rectangle> rects;
-    //Se crean 6 rectángulos aleatorios
-    for (int i = 0; i < 7; i++) {
-        int a = distr(eng);
-        int b = distr(eng);
-        int c = distr(eng);
-        int d = distr(eng);
-        int x1 = min(a, c);
-        int x2 = max(a, c);
-        int y1 = min(b, d);
-        int y2 = max(b, d);
-        Rectangle rect = {x1, y1, x2, y2};
-        rects.push_back(rect);
-        cout << "Rectangulo " << i+1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
+// //Main que genera aleatoriamente 6 rectángulos en un plano de 20x20 y los agrupa en un R-tree
+// //utiliza include random
+// int main(){
+//     random_device rd;
+//     mt19937 eng(rd());
+//     uniform_int_distribution<> distr(0, 20);
+//     //Se crea un vector de rectángulos
+//     vector<Rectangle> rects;
+//     //Se crean 6 rectángulos aleatorios
+//     for (int i = 0; i < 7; i++) {
+//         int a = distr(eng);
+//         int b = distr(eng);
+//         int c = distr(eng);
+//         int d = distr(eng);
+//         int x1 = min(a, c);
+//         int x2 = max(a, c);
+//         int y1 = min(b, d);
+//         int y2 = max(b, d);
+//         Rectangle rect = {x1, y1, x2, y2};
+//         rects.push_back(rect);
+//         cout << "Rectangulo " << i+1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
 
-    }
-    // Se hacen las hojas
-    vector<Node*> leaves = makeLeaves(rects);
-    for (int i=0; i<7; i++) {
-        cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
-    }
-    //Se crea el R-tree
-    RTree rtree = makeGroups(leaves, 3);
-    //Impresión de los nodos hoja
-    cout << "Nodos hoja: " << endl;
+//     }
+//     // Se hacen las hojas
+//     vector<Node*> leaves = makeLeaves(rects);
+//     for (int i=0; i<7; i++) {
+//         cout << "Centro: " << leaves[i]->MBR.centerX() << endl;
+//     }
+//     //Se crea el R-tree
+//     RTree rtree = makeGroups(leaves, 3);
+//     //Impresión de los nodos hoja
+//     cout << "Nodos hoja: " << endl;
 
-    cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 <<endl;
+//     cout << "Nodo " << ": " << rtree.root->MBR.x1 << ", " << rtree.root->MBR.x2 <<endl;
 
-    //Se crea un rectángulo para buscar
-    Rectangle rect = {0, 0, 10, 10}; //Cuadrado de 10x10 centrado en (5,5)
-    //Se busca el rectángulo
-    vector<Rectangle> result = rtree.search(rect);
-    //Se imprime el rectangulo
-    cout << "Rectangulo a buscar: " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
-    //Se imprime el resultado
-    cout << "Resultado: " << endl;
-    for (int i=0; i<result.size(); i++) {
-        cout << "Rectangulo " << i+1 << ": " << result[i].x1 << ", " << result[i].x2 << " " << result[i].y1 << ", " << result[i].y2 << endl;
-    }
-    return 0;
-}
+//     //Se crea un rectángulo para buscar
+//     Rectangle rect = {0, 0, 10, 10}; //Cuadrado de 10x10 centrado en (5,5)
+//     //Se busca el rectángulo
+//     vector<Rectangle> result = rtree.search(rect);
+//     //Se imprime el rectangulo
+//     cout << "Rectangulo a buscar: " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
+//     //Se imprime el resultado
+//     cout << "Resultado: " << endl;
+//     for (int i=0; i<result.size(); i++) {
+//         cout << "Rectangulo " << i+1 << ": " << result[i].x1 << ", " << result[i].x2 << " " << result[i].y1 << ", " << result[i].y2 << endl;
+//     }
+//     return 0;
+// }
+
+// //Hola

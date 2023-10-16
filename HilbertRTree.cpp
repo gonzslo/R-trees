@@ -40,32 +40,22 @@ int xy2d (int n, int x, int y) {
     return d;
 }
 
-//convierte d a (x,y)
-void d2xy(int n, int d, int *x, int *y) {
-    int rx, ry, s, t=d;
-    *x = *y = 0;
-    for (s = 1; s < n; s *= 2) {
-        rx = 1 & (t/2);
-        ry = 1 & (t ^ rx);
-        rot(s, x, y, rx, ry);
-        *x += s * rx;
-        *y += s * ry;
-        t /= 4;
-    }
-}
-
 // Se crea función que ordena los centros de los rectángulos en función
 // de su valor dentro de la curva de Hilbert
 void ordenarRectangulosHilbert(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        int n = 2;
+        int n = 40;
         float x1 = (a.x2-a.x1)/2.0f;
         float y1 = (a.y2-a.y1)/2.0f;
         float x2 = (b.x2-b.x1)/2.0f;
         float y2 = (b.y2-b.y1)/2.0f;
 
+        // cout << "Si n fuera 500mil, d1: " << xy2d(20, x1, y1) << endl;
+        // cout << "Si n fuera 500mil, d2: " << xy2d(20, x2, y2) << endl;
         int d1 = xy2d(n, x1, y1);
         int d2 = xy2d(n, x2, y2);
+        // cout << "d1: " << d1 << endl;
+        // cout << "d2: " << d2 << endl;
         return d1 < d2; });
 }
 
@@ -142,7 +132,7 @@ Node *makeParent(vector<Node *> children){
 // Función que crea hojas a partir de un vector de rectángulos que primero ordena
 vector<Node *> makeLeaves(vector<Rectangle> rects){
     vector<Node *> leaves;
-    ordenarRectangulosX(rects);
+    ordenarRectangulosHilbert(rects);
     for (int i = 0; i < rects.size(); i++){
         Node *node = makeLeaf(rects[i]);
         leaves.push_back(node);

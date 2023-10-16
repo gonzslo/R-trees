@@ -4,6 +4,8 @@
 #include <cmath>
 
 using namespace std;
+
+
 // Se crea estructura para los rectángulos
 struct Rectangle{
     // Coordenadas de la esquina inferior izquierda
@@ -69,3 +71,11 @@ struct RTree{
         return result;
     }
 };
+
+void ordenarRectangulosX(vector<Rectangle> &rects);
+Node *makeLeaf(Rectangle rect);
+Node *makeParent(vector<Node *> children);
+vector<Node *> makeLeaves(vector<Rectangle> rects);
+Node *makeLeaf(Rectangle rect);
+RTree makeGroups(vector<Node *> children, int M);
+RTree nearestX(vector<Rectangle> rects, int M);

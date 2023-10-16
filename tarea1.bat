@@ -1,3 +1,4 @@
- g++ -O3 algoritmos.cpp tests.cpp -o tarea1.exe
+cd R-trees
+ g++ -O3 algoritmo1.cpp Tests.cpp -o tarea1.exe
 
  tarea1.exe
