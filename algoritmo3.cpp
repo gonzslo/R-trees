@@ -112,13 +112,12 @@ vector<vector<Rectangle>> makeXGroups(vector<Rectangle> points, int M){
     vector<vector<Rectangle>> grupo; // grupo es vector de vectores de puntos
     for (int i = 0; i < (int)ceil(sqrt((double)points.size() / M)); i++){
         vector<Rectangle> grupito; // grupito es vector de puntos
-        for (int j = 0; j < M; j++){
-            int index = i * M + j;
+        for (int j = 0; j < (int)ceil(sqrt((double)points.size() * M)); j++){
+            int index = i * (int)ceil(sqrt((double)points.size() * M)) + j;
             if (index >= points.size()){
                 break;
             }
             grupito.push_back(points[index]);
-            
         }
         grupo.push_back(grupito);
         grupito.clear();
@@ -126,19 +125,25 @@ vector<vector<Rectangle>> makeXGroups(vector<Rectangle> points, int M){
     return grupo;
 }
 
-// Función que recibe un vector vectores de puntos y hace grupos de tamaño sqrt(n/M)
+// Función que recibe un vector vectores de puntos y hace sqrt(n/M) grupos de tamaño M
 // Estos si son nodos
 vector<Node *> makeYGroups(vector<vector<Rectangle>> XGroups, int M){
     vector<Node *> grupo; // este grupo es vector de nodos
     for (int i = 0; i < XGroups.size(); i++){ // hay que crear un rectangulo que contenga los puntos
         vector<Node *> points_leaves = makeLeavesY(XGroups[i]); // convertir puntos en hojas
         vector<Node *> grupito; // grupito es vector de nodos
-        for (int j = 0; j < (int)ceil((double)XGroups[i].size()/M); j++){
-            grupito.push_back(points_leaves[j]);
+        for (int j = 0; j < (int)ceil((double)XGroups[i].size()/M); j++) { // sqrt(n/M) nodos
+            for(int k = 0; k < M; k++){
+                int index = j * M + k;
+                if (index >= XGroups[i].size()){
+                    break;
+                }
+                grupito.push_back(points_leaves[index]);
+            }
+            Node *node = makeParent(grupito);
+            grupo.push_back(node);
+            grupito.clear();
         }
-        Node *node = makeParent(grupito);
-        grupo.push_back(node);
-        grupito.clear();
     }
     return grupo; // vector con todos los MBR que contienen a los puntos (nodos)
 }
@@ -186,16 +191,37 @@ int main() {
     }
     // Se ordena la coordenada x de los puntos 
     ordenarRectangulosX(points);
+    /*cout << "Coordenadas X ordenadas: " << endl;
     for (int i=0; i<points.size(); i++) {
-        cout << "Coordenada X: " << points[i].x1 << endl;
-    }
-    // Agruparlos en sqrt(n/M) grupos según su coordenada X
-    vector<vector<Rectangle>> XGroups = makeXGroups(points, 6);
-
-    /*
-    cout << "Resultado: " << endl;
-    for (int i=0; i<points.size(); i++) {
-        cout << "Rectangulo " << i+1 << ": " << points[i].x1 << ", " << result[i].x2 << " " << result[i].y1 << ", " << result[i].y2 << endl;
+        cout << points[i].x1 << ", " << endl;
     }*/
+    // Agruparlos en sqrt(n/M) grupos según su coordenada X
+    vector<vector<Rectangle>> XGroups = makeXGroups(points, 4);
+    for (int k = 0; k < XGroups.size(); k++){
+        cout << "Grupo " << k+1 << ": "<< endl;
+        for(int i = 0; i < XGroups[k].size(); i++) {
+            cout << "Punto " << i+1 << ": " << XGroups[k][i].x1 << ", " << XGroups[k][i].y1 << endl;
+        }
+    }
+    // Ordenar los puntos de cada grupo según su coordenada Y
+    for (int i = 0; i < XGroups.size(); i++){
+        ordenarRectangulosY(XGroups[i]); // Ordena la coordenada Y en cada grupito
+    }
+    /*for (int k = 0; k < XGroups.size(); k++){
+        cout << "Grupo " << k+1 << " con coordenada Y ordenada: "<< endl;
+        for(int i = 0; i < XGroups[k].size(); i++) {
+            cout << "Punto " << i+1 << ": " << XGroups[k][i].x1 << ", " << XGroups[k][i].y1 << endl;
+        }
+    }*/
+    // Se hacen sqrt(n/M) grupos de tamaño M dentro de cada XGroup
+    vector<Node *> leaves = makeYGroups(XGroups, 4); // Recién en este punto se tienen n/M nodos
+    for (int k = 0; k < leaves.size(); k++){
+        cout << "Hoja " << k+1 << ": (" << leaves[k]->MBR.x1 << ", " << leaves[k]->MBR.y1 << ") (" 
+        << leaves[k]->MBR.x2 << ", " << leaves[k]->MBR.y2 << ")" << endl;
+    }
+    // Se repite recursivamente
+    RTree rtree = SortTileRecursive(makePoints(leaves),4);
+    cout << "Nodo raiz: (" << rtree.root->MBR.x1 << ", " << rtree.root->MBR.y1 << ") (" 
+        << rtree.root->MBR.x2 << ", " << rtree.root->MBR.y2 << ")" << endl;
     return 0;
 }
