@@ -44,11 +44,11 @@ int xy2d (int n, int x, int y) {
 // de su valor dentro de la curva de Hilbert
 void ordenarRectangulosHilbert(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        int n = 40;
-        float x1 = (a.x2-a.x1)/2.0f;
-        float y1 = (a.y2-a.y1)/2.0f;
-        float x2 = (b.x2-b.x1)/2.0f;
-        float y2 = (b.y2-b.y1)/2.0f;
+        int n = 2;
+        float x1 = (a.x2+a.x1)/2.0f;
+        float y1 = (a.y2+a.y1)/2.0f;
+        float x2 = (b.x2+b.x1)/2.0f;
+        float y2 = (b.y2+b.y1)/2.0f;
 
         // cout << "Si n fuera 500mil, d1: " << xy2d(20, x1, y1) << endl;
         // cout << "Si n fuera 500mil, d2: " << xy2d(20, x2, y2) << endl;
@@ -79,15 +79,23 @@ void testHilbert(){
         rect.y1 = y1;
         rect.x2 = x2;
         rect.y2 = y2;
-        cout << "Rectangulo " << i + 1 << ": " << x1 << ", " << x2 << " " << y1 << ", " << y2 << endl;
+        if (x2>20){
+            rect.x2 = 20;
+        }
+        if (y2>20){
+            rect.y2 = 20;
+        }
+        cout << "Rectangulo " << i + 1 << ": " << rect.centerX() <<", " << rect.centerY() << endl;
+        cout << "Distancia de Hilbert: " << xy2d(11, rect.centerX(), rect.centerY()) << endl;
         rects.push_back(rect);
     }
     //Se ordenan los rectángulos según su centro en la curva de Hilbert
+    cout << endl;
     ordenarRectangulosHilbert(rects);
     for (int i = 0; i < rects.size(); i++){
-        cout << "Rectangulo " << i + 1 << ": " << rects[i].x1 << ", " << rects[i].x2 << " " << rects[i].y1 << ", " << rects[i].y2 << endl;
+        cout << "Rectangulo " << i + 1 << ": " << rects[i].centerX() <<", " << rects[i].centerY() << endl;
+        cout << "Distancia de Hilbert: " << xy2d(4, rects[i].centerX(), rects[i].centerY()) << endl;
     }
-
 }
 
 

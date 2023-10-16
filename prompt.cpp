@@ -223,9 +223,12 @@ int main(){
     //Se leen los árboles desde los archivos binarios
     for (int i=0; i<16; i++){
         int diskAccesses = 0;
-        RTree rtree = readRTreeFromFile(diskAccesses, i);
+        RTree rtree1 = readRTreeFromFile(diskAccesses, i);
         cout << "Accesos a disco: " << diskAccesses << endl;
+        //imprime el arbol:
     }
+    
+    
     
     return 0;
 }

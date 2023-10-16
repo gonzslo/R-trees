@@ -26,6 +26,9 @@ struct Rectangle{
     float centerX(){
         return (x1 + x2) / 2.0f;
     }
+    float centerY(){
+        return (y1 + y2) / 2.0f;
+    }
 };
 
 // Definimos los nodos, que son los rectángulos que se encuentran en el árbol
@@ -72,11 +75,28 @@ struct RTree{
         }
     }
     // Búsqueda: retorna un vector de rectangulos que intersectan con value
-    std::vector<Rectangle> search(const Rectangle& value) {
-        std::vector<Rectangle> result;
+    vector<Rectangle> search(const Rectangle& value) {
+        vector<Rectangle> result;
         searchRecursive(root, value, result);
         return result;
     }
+    //Método para imprimir un R-tree
+    void print(Node *root){
+        if(root == nullptr)
+            return;
+        if(root->isLeaf){
+            cout << "Leaf: " << root->MBR.x1 << " " << root->MBR.y1 << " " << root->MBR.x2 << " " << root->MBR.y2 << endl;
+        }else{
+            cout << "Node: " << root->MBR.x1 << " " << root->MBR.y1 << " " << root->MBR.x2 << " " << root->MBR.y2 << endl;
+            for(int i = 0; i < root->children.size(); i++){
+                print(root->children[i]);
+            }
+        }
+    }
+
+
+
+
 };
 
 void ordenarRectangulosX(vector<Rectangle> &rects);
