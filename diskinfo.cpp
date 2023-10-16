@@ -6,8 +6,9 @@ unsigned int getDiskBlockSize() {
     DWORD sectorsPerCluster, bytesPerSector, freeClusters, totalClusters;
 
     // Convert narrow-character string to wide-character string
+    LPCWSTR lpPath = TEXT(".");
 
-    if (GetDiskFreeSpace(".", &sectorsPerCluster, &bytesPerSector, &freeClusters, &totalClusters)) {
+    if (GetDiskFreeSpace(lpPath, &sectorsPerCluster, &bytesPerSector, &freeClusters, &totalClusters)) {
         return bytesPerSector * sectorsPerCluster;
     } else {
         // Handle error
