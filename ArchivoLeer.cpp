@@ -13,20 +13,19 @@ using namespace std;
 
 int main(){
     //Abrir el archivo que contiene al nodo
-    FILE* arch = fopen("nodo.bin", "rb");
+    FILE* arch = fopen("leavesNX10.bin", "rb");
     if (arch == NULL){
         cout << "Error al abrir el archivo" << endl;
         return 1;
     }
-    Node *node = new Node;
-    Node *node2 = new Node;
-    // fread(node, sizeof(Node), 1, arch);
-    fseek(arch, sizeof(Node), SEEK_SET);
-    fread(node2, sizeof(Node), 1, arch);
+    
+    for(int i = 0; i<pow(2,10); i++) {
+        Node *node = new Node;
+        fread(node, sizeof(Node), 1, arch);
+        cout << node->MBR.centerX() << " " << i << endl;
+    }
 
     fclose(arch);
-    node->MBR.print();
-    node2->MBR.print();
     return 0;
 
 }

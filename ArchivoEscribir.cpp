@@ -124,7 +124,7 @@ vector<Rectangle> createRandomRectangles(int n){
     //Valores aleatorios entre 0 y 500mil
     uniform_int_distribution<> distr1(0, 500000);
     //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 100
-    uniform_int_distribution<> distr2(0, 100);
+    uniform_int_distribution<> distr2(0, 500000);
 
     // //Valores aleatorios entre 0 y 20
     // uniform_int_distribution<> distr1(0, 100);
