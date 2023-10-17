@@ -149,11 +149,14 @@ vector<Rectangle> createRandomRectangles(int n){
 }    
 
 int main(){
+
     // //Se crea un nodo con un rectángulo
     // Rectangle rect = {4, 94, 51, 100};
+    // Rectangle rect2 = {1, 2, 3, 2};
     // Node *node = makeLeaf(rect);
+    // Node *node2 = makeLeaf(rect2);
     // node->MBR.print();
-
+    // node2->MBR.print();
     // //Guardamos el nodo en disco
     // FILE* arch = fopen("nodo.bin", "wb");
     // if (arch == NULL){
@@ -161,6 +164,7 @@ int main(){
     //     return 1;
     // }
     // fwrite(node, sizeof(Node), 1, arch);
+    // fwrite(node2, sizeof(Node), 1, arch);
     // fclose(arch);
 
     //Abrir el archivo que contiene al nodo
@@ -170,10 +174,17 @@ int main(){
         return 1;
     }
     Node *node = new Node;
-    fread(node, sizeof(Node), 1, arch);
+    Node *node2 = new Node;
+    // fread(node, sizeof(Node), 1, arch);
+    fseek(arch, sizeof(Node), SEEK_SET);
+    fread(node2, sizeof(Node), 1, arch);
+
     fclose(arch);
-    node->MBR.print();
+    // node->MBR.print();
+    node2->MBR.print();
     return 0;
+
+    
 
 
     
