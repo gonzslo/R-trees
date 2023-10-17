@@ -3,7 +3,11 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
-#include <algoritmo1.hpp>
+#include "algoritmo1.hpp"
+#include <chrono>
+#include <fstream>
+#include <random>
+using namespace std;
 
 using namespace std;
 
@@ -21,7 +25,7 @@ int main(){
     fread(node2, sizeof(Node), 1, arch);
 
     fclose(arch);
-    // node->MBR.print();
+    node->MBR.print();
     node2->MBR.print();
     return 0;
 

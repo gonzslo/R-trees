@@ -2,9 +2,9 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include<algorithm>
-#include<algoritmo1.hpp>
-#include<chrono>
+#include <algorithm>
+#include "algoritmo1.hpp"
+#include <chrono>
 #include <fstream>
 #include <random>
 using namespace std;
@@ -88,7 +88,7 @@ RTree makeGroups(vector<Node *> children, int M){
         Node *node = makeParent(grupito);
 
         grupo.push_back(node);
-        cout << "Nodo grupito: " << node->MBR.x1 << ", " << node->MBR.x2 << endl;
+        //cout << "Nodo grupito: " << node->MBR.x1 << ", " << node->MBR.x2 << endl;
         for (int k = 0; k < grupito.size(); k++){
             //cout << "Nodo hoja: " << grupito[k]->MBR.x1 << ", " << grupito[k]->MBR.x2 << endl;
         }
@@ -98,8 +98,19 @@ RTree makeGroups(vector<Node *> children, int M){
 }
 
 // Función Nearest-X que construye un R-tree a partir de un vector de rectángulos y un parámetro M
-RTree nearestX(vector<Rectangle> rects, int M){
+RTree nearestX(vector<Rectangle> rects, int M, int factor){
     vector<Node *> leaves = makeLeaves(rects);
+    string nombre = "leavesNX" + to_string(factor) + ".bin";
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
+    }
+    for (int i = 0; i < leaves.size(); i++){
+        fwrite(leaves[i], sizeof(Node), 1, arch);
+    }
+
+    fclose(arch);
     RTree rtree = makeGroups(leaves, M);
     return rtree;
 }
@@ -110,17 +121,17 @@ vector<Rectangle> createRandomRectangles(int n){
     random_device rd;
     mt19937 gen(rd());
 
-    // //Valores aleatorios entre 0 y 500mil
-    // uniform_int_distribution<> distr1(0, 500000);
-    // //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 100
-    // uniform_int_distribution<> distr2(0, 100);
+    //Valores aleatorios entre 0 y 500mil
+    uniform_int_distribution<> distr1(0, 500000);
+    //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 100
+    uniform_int_distribution<> distr2(0, 100);
 
-    //Valores aleatorios entre 0 y 20
-    uniform_int_distribution<> distr1(0, 100);
-    //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 10
-    uniform_int_distribution<> distr2(0, 10);
+    // //Valores aleatorios entre 0 y 20
+    // uniform_int_distribution<> distr1(0, 100);
+    // //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 10
+    // uniform_int_distribution<> distr2(0, 10);
 
-    int j = pow(2,n+9); // Número de rectángulos
+    int j = pow(2,n); // Número de rectángulos
     for (int i=0; i<j; i++){
         int x1 = distr1(gen);
         int y1 = distr1(gen);
@@ -149,22 +160,31 @@ vector<Rectangle> createRandomRectangles(int n){
 
 int main(){
 
-    //Se crea un nodo con un rectángulo
-    Rectangle rect = {4, 94, 51, 100};
-    Rectangle rect2 = {1, 2, 3, 2};
-    Node *node = makeLeaf(rect);
-    Node *node2 = makeLeaf(rect2);
-    node->MBR.print();
-    node2->MBR.print();
-    //Guardamos el nodo en disco
-    FILE* arch = fopen("nodo.bin", "wb");
-    if (arch == NULL){
-        cout << "Error al abrir el archivo" << endl;
-        return 1;
-    }
-    fwrite(node, sizeof(Node), 1, arch);
-    fwrite(node2, sizeof(Node), 1, arch);
-    fclose(arch);
+    // //Se crea un nodo con un rectángulo
+    // Rectangle rect = {4, 20, 5, 30};
+    // Rectangle rect2 = {1, 2, 3, 2};
+    // Node *node = makeLeaf(rect);
+    // Node *node2 = makeLeaf(rect2);
+    // node->MBR.print();
+    // node2->MBR.print();
+    // //Guardamos el nodo en disco
+    // FILE* arch = fopen("nodo.bin", "wb");
+    // if (arch == NULL){
+    //     cout << "Error al abrir el archivo" << endl;
+    //     return 1;
+    // }
+    // fwrite(node, sizeof(Node), 1, arch);
+    // fwrite(node2, sizeof(Node), 1, arch);
+    // fclose(arch);
 
+    //Crea varios vectores de rectángulos
+    
+    for (int i = 10; i<=25; i++){
+        vector<Rectangle> rects = createRandomRectangles(i);
+        RTree rtree = nearestX(rects, 1024, i);
+
+        
+    }
+    return 0;
     
 }
