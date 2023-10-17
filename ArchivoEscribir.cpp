@@ -101,6 +101,7 @@ RTree makeGroups(vector<Node *> children, int M){
 RTree nearestX(vector<Rectangle> rects, int M, int factor){
     vector<Node *> leaves = makeLeaves(rects);
     string nombre = "leavesNX" + to_string(factor) + ".bin";
+
     FILE *arch = fopen(nombre.c_str(), "wb");
     if (arch == NULL){
         cout << "Error al abrir el archivo" << endl;
@@ -159,31 +160,10 @@ vector<Rectangle> createRandomRectangles(int n){
 
 
 int main(){
-
-    // //Se crea un nodo con un rectángulo
-    // Rectangle rect = {4, 20, 5, 30};
-    // Rectangle rect2 = {1, 2, 3, 2};
-    // Node *node = makeLeaf(rect);
-    // Node *node2 = makeLeaf(rect2);
-    // node->MBR.print();
-    // node2->MBR.print();
-    // //Guardamos el nodo en disco
-    // FILE* arch = fopen("nodo.bin", "wb");
-    // if (arch == NULL){
-    //     cout << "Error al abrir el archivo" << endl;
-    //     return 1;
-    // }
-    // fwrite(node, sizeof(Node), 1, arch);
-    // fwrite(node2, sizeof(Node), 1, arch);
-    // fclose(arch);
-
-    //Crea varios vectores de rectángulos
-    
+    //Crea rectángulos y hace hojas desde 2^10 hasta 2^25
     for (int i = 10; i<=25; i++){
         vector<Rectangle> rects = createRandomRectangles(i);
         RTree rtree = nearestX(rects, 1024, i);
-
-        
     }
     return 0;
     
