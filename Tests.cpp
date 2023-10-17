@@ -86,7 +86,6 @@ void test3(){
     // vector<Rectangle> result = rtree.search(rect);
     
     // Se serializa el R-tree para guardarlo en un archivo binario
-    serialize(rtree, "rtree.bin");
 
 }
 
