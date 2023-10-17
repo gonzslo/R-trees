@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
-
+#include<algorithm>
 using namespace std;
 
 
@@ -28,6 +28,9 @@ struct Rectangle{
     }
     float centerY(){
         return (y1 + y2) / 2.0f;
+    }
+    void print(){
+        cout << "x1: " << x1 << " y1: " << y1 << " x2: " << x2 << " y2: " << y2 << endl;
     }
 };
 
