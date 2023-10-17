@@ -93,8 +93,8 @@ void testHilbert(){
     cout << endl;
     ordenarRectangulosHilbert(rects);
     for (int i = 0; i < rects.size(); i++){
-        cout << "Rectangulo " << i + 1 << ": " << rects[i].centerX() <<", " << rects[i].centerY() << endl;
-        cout << "Distancia de Hilbert: " << xy2d(4, rects[i].centerX(), rects[i].centerY()) << endl;
+        cout << "Rectangulo " << i + 1 << ": " << rects[i].centerX() <<", " << rects[i].centerY();
+        cout << " Distancia de Hilbert: " << xy2d(4, rects[i].centerX(), rects[i].centerY()) << endl;
     }
 }
 
