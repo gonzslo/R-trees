@@ -120,7 +120,10 @@ RTree nearestX(vector<Rectangle> rects, int M, int factor){
     }
 
     fclose(arch);
-    RTree rtree = makeGroups(leaves, M, factor, 0);
+
+    int nivel = 0;
+    int result = ceil((log10(pow(2,  nivel + 10)) / log10(1024))) ;
+    RTree rtree = makeGroups(leaves, M, factor, result);
     return rtree;
 }
 
@@ -172,6 +175,7 @@ int main(){
     for (int i = 10; i<=25; i++){
         vector<Rectangle> rects = createRandomRectangles(i);
         RTree rtree = nearestX(rects, 1024, i);
+        
     }
     return 0;
     
