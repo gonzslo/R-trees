@@ -75,6 +75,12 @@ RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
         RTree rtree = RTree();
         rtree.hijos = children;
         rtree.root = children[0];
+        FILE *arch = fopen(nombre.c_str(), "wb");
+        if (arch == NULL){
+            cout << "Error al abrir el archivo" << endl;
+            return RTree();
+        }
+        fwrite(rtree.root, sizeof(Node), 1, arch);
         return rtree;
     }
     for (int i = 0; i < (int)ceil((double)children.size() / M); i++){
@@ -102,6 +108,8 @@ RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
     for (int i = 0; i < grupo.size(); i++){
         fwrite(grupo[i], sizeof(Node), 1, arch);
     }
+    fclose(arch);
+
     return makeGroups(grupo, M, factor, nivel+1);
 }
 
