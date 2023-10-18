@@ -110,7 +110,8 @@ RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
 // Función Nearest-X que construye un R-tree a partir de un vector de rectángulos y un parámetro M
 RTree nearestX(vector<Rectangle> rects, int M, int factor){
     vector<Node *> leaves = makeLeaves(rects);
-    string nombre = "leavesNX" + to_string(factor) + ".bin";
+    int nivel = ceil((log10(pow(2,  factor)) / log10(1024))) ;
+    string nombre = "groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
 
     FILE *arch = fopen(nombre.c_str(), "wb");
     if (arch == NULL){
@@ -123,9 +124,8 @@ RTree nearestX(vector<Rectangle> rects, int M, int factor){
 
     fclose(arch);
 
-    int nivel = factor-10;
-    int result = ceil((log10(pow(2,  nivel + 10)) / log10(1024))) ;
-    RTree rtree = makeGroups(leaves, M, factor, result);
+    
+    RTree rtree = makeGroups(leaves, M, factor, nivel);
     return rtree;
 }
 
