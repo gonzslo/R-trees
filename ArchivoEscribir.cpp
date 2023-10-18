@@ -68,7 +68,8 @@ vector<Node *> makeLeaves(vector<Rectangle> rects){
 }
 
 // Función que recibe un vector de nodos y hace grupos
-RTree makeGroups(vector<Node *> children, int M){
+RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
+    string nombre = "groupsNX" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
     vector<Node *> grupo; //
     if (children.size() == 1){
         RTree rtree = RTree();
@@ -86,15 +87,22 @@ RTree makeGroups(vector<Node *> children, int M){
             grupito.push_back(children[index]);
         }
         Node *node = makeParent(grupito);
-
         grupo.push_back(node);
         //cout << "Nodo grupito: " << node->MBR.x1 << ", " << node->MBR.x2 << endl;
-        for (int k = 0; k < grupito.size(); k++){
-            //cout << "Nodo hoja: " << grupito[k]->MBR.x1 << ", " << grupito[k]->MBR.x2 << endl;
-        }
+        // for (int k = 0; k < grupito.size(); k++){
+        //     //cout << "Nodo hoja: " << grupito[k]->MBR.x1 << ", " << grupito[k]->MBR.x2 << endl;
+        // }
         grupito.clear();
     }
-    return makeGroups(grupo, M);
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
+    }
+    for (int i = 0; i < grupo.size(); i++){
+        fwrite(grupo[i], sizeof(Node), 1, arch);
+    }
+    return makeGroups(grupo, M, factor, nivel+1);
 }
 
 // Función Nearest-X que construye un R-tree a partir de un vector de rectángulos y un parámetro M
@@ -112,7 +120,7 @@ RTree nearestX(vector<Rectangle> rects, int M, int factor){
     }
 
     fclose(arch);
-    RTree rtree = makeGroups(leaves, M);
+    RTree rtree = makeGroups(leaves, M, factor, 0);
     return rtree;
 }
 
