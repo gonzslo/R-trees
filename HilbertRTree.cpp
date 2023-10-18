@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <random>
 #include <math.h>
-#include "algoritmo1.hpp"
+#include "Structures.hpp"
 using namespace std;
 
 // Se crea función que recibe un vector de rectángulos y los ordena según la coordenada X del centro del rectángulo

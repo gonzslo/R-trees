@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
-#include "algoritmo1.hpp"
+#include "Structures.hpp"
 #include <chrono>
 #include <fstream>
 #include <random>
@@ -111,7 +111,7 @@ RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
 RTree nearestX(vector<Rectangle> rects, int M, int factor){
     vector<Node *> leaves = makeLeaves(rects);
     int nivel = ceil((log10(pow(2,  factor)) / log10(1024))) ;
-    string nombre = "groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
+    string nombre = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
 
     FILE *arch = fopen(nombre.c_str(), "wb");
     if (arch == NULL){

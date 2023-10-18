@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
-#include "algoritmo1.hpp"
+#include "Structures.hpp"
 #include <chrono>
 #include <fstream>
 #include <random>

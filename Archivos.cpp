@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ostream>
-#include "algoritmo1.hpp"
+#include "Structures.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
