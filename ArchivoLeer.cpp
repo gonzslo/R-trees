@@ -9,23 +9,16 @@ bool intersects(const Rectangle& rect1, const Rectangle& rect2) {
 
     return x_overlap && y_overlap;
 }
-void searchRecursive(Node* currentNode, const Rectangle& value, std::vector<Rectangle>& result, int nivel, int factor, string filename, FILE *file) {
-    /*if(currentNode == nullptr)
-        return;*/ //Este caso ya no existe :P
-    /*if(currentNode->isLeaf) {
-        if (intersects(currentNode->MBR, value)) {
-            result.push_back(currentNode->MBR);
-        }
-    }*/ // Se reemplaza por estar en el último nivel:
+void searchRecursive(Node* currentNode, const Rectangle& value,
+                     std::vector<Rectangle>& result,int nivel, 
+                     int factor, string filename, FILE *file) {
+
     if(filename == "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin") { // Si estamos en el último nivel (en las hojas del arbol)
         result.push_back(currentNode->MBR); // Caso base porque estamos al final
     }
     else { // Recursión
-        /*for (Node* child : currentNode->children) {
-            if(intersects(child->MBR, value)) {
-                searchRecursive(child, value, result);
-            }
-        }*/ // Hay que cambiar la iteración por búsqueda en el siguiente archivo en el puntero del hijo del nodo MBR que intersecta
+       
+         // Hay que cambiar la iteración por búsqueda en el siguiente archivo en el puntero del hijo del nodo MBR que intersecta
         if(intersects(currentNode->MBR, value)) { // Avanzamos en el nivel desde el primer MBR que intersecta hasta el último
             
         } else {
@@ -35,11 +28,11 @@ void searchRecursive(Node* currentNode, const Rectangle& value, std::vector<Rect
     }
 }
 // Búsqueda: retorna un vector de rectangulos que intersectan con value
-vector<Rectangle> search(Node* node, const Rectangle& value) {
+vector<Rectangle> search(Node* node, const Rectangle& value, int nivel, int factor, string filename, FILE *file) {
     vector<Rectangle> result;
     if(!intersects(node->MBR, value))
         return vector<Rectangle>();
-    searchRecursive(node, value, result);
+    searchRecursive(node, value, result, nivel, factor, filename, file);
     return result;
 }
 
@@ -72,16 +65,7 @@ int main(){
                 for (int i=0; i<nodosporleer; i++){ //Leer todos los nodos del archivo
                     Node *node = new Node;
                     fread(node, sizeof(Node), 1, arch);
-                    // Busca los rectángulos que están en el nodo
-                    // node->MBR.print();
-                    // if(intersects(node->MBR, value)) {
-                    //     vector<Node *> result;
-                    //     if(filename == "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin") { // Si estamos en el último nivel (en las hojas del arbol)
-                    //         return result.push_back(node);
-                    //     } else {
-                    //         fseek()
-                    //     }
-                    // }
+
                 }
                 fclose(arch);
             }
