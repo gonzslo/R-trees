@@ -52,8 +52,6 @@ int main(){
         //RTree rtree1 = nearestX(rects, 1024, i);
         // RTree rtree2 = HilbertRTree(rects, 1024, i);
         RTree rtree3 = SortTileRecursive(rects, 1024, i);
-        
     }
     return 0;
-    
 }
