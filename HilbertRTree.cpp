@@ -1,19 +1,7 @@
-#include <vector>
-#include <iostream>
-#include <ostream>
-#include <algorithm>
-#include <random>
-#include <math.h>
 #include "Structures.hpp"
 using namespace std;
 
-// Se crea función que recibe un vector de rectángulos y los ordena según la coordenada X del centro del rectángulo
-void ordenarRectangulosX(vector<Rectangle> &rects){
-    sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        float mean_a = (a.x1 + a.x2) / 2.0f;
-        float mean_b = (b.x1 + b.x2) / 2.0f;
-        return mean_a < mean_b; });
-}
+
 // Se crea función que convierte un punto a su representación en la curva de Hilbert
 //convierte (x,y) a d
 //rotar/voltear un cuadrante apropiadamente
@@ -97,8 +85,6 @@ void testHilbert(){
         cout << " Distancia de Hilbert: " << xy2d(4, rects[i].centerX(), rects[i].centerY()) << endl;
     }
 }
-
-
 
 Node *makeLeaf(Rectangle rect){
     Node *node = new Node;
