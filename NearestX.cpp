@@ -61,7 +61,7 @@ vector<Node *> makeLeaves(vector<Rectangle> rects){
 
 // Función que recibe un vector de nodos y hace grupos
 RTree makeGroups(vector<Node *> children, int M, int factor, int nivel){
-    string nombre = "groupsNX" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
+    string nombre = "binNX/groupsNX" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
     vector<Node *> grupo; //
     if (children.size() == 1){
         RTree rtree = RTree();
