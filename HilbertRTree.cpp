@@ -30,6 +30,7 @@ int xy2d (int n, int x, int y) {
 
 // Se crea función que ordena los centros de los rectángulos en función
 // de su valor dentro de la curva de Hilbert
+
 void ordenarRectangulosHilbert(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
         int n = 4;
@@ -38,93 +39,12 @@ void ordenarRectangulosHilbert(vector<Rectangle> &rects){
         float x2 = (b.x2+b.x1)/2.0f;
         float y2 = (b.y2+b.y1)/2.0f;
 
-        // cout << "Si n fuera 500mil, d1: " << xy2d(20, x1, y1) << endl;
-        // cout << "Si n fuera 500mil, d2: " << xy2d(20, x2, y2) << endl;
         int d1 = xy2d(n, x1, y1);
         int d2 = xy2d(n, x2, y2);
-        // cout << "d1: " << d1 << endl;
-        // cout << "d2: " << d2 << endl;
+
         return d1 < d2; });
 }
-
-void testHilbert(){
-    //Crea 6 rectángulos aleatorios en un cuadrante de 20x20
-    vector<Rectangle> rects;
-    random_device rd;
-    mt19937 gen(rd());
-    //Valores aleatorios entre 0 y 20
-    uniform_int_distribution<> distr1(0, 20);
-    //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 10
-    uniform_int_distribution<> distr2(0, 10);
-
-    for (int i = 0; i < 6; i++){
-        int x1 = distr1(gen);
-        int y1 = distr1(gen);
-        int x2 = x1 + distr2(gen);
-        int y2 = y1 + distr2(gen);
-        Rectangle rect;
-        rect.x1 = x1;
-        rect.y1 = y1;
-        rect.x2 = x2;
-        rect.y2 = y2;
-        if (x2>20){
-            rect.x2 = 20;
-        }
-        if (y2>20){
-            rect.y2 = 20;
-        }
-        cout << "Rectangulo " << i + 1 << ": " << rect.centerX() <<", " << rect.centerY() << endl;
-        cout << "Distancia de Hilbert: " << xy2d(4, rect.centerX(), rect.centerY()) << endl;
-        rects.push_back(rect);
-    }
-    //Se ordenan los rectángulos según su centro en la curva de Hilbert
-    cout << endl;
-    ordenarRectangulosHilbert(rects);
-    for (int i = 0; i < rects.size(); i++){
-        cout << "Rectangulo " << i + 1 << ": " << rects[i].centerX() <<", " << rects[i].centerY();
-        cout << " Distancia de Hilbert: " << xy2d(4, rects[i].centerX(), rects[i].centerY()) << endl;
-    }
-}
-
-Node *makeLeaf(Rectangle rect){
-    Node *node = new Node;
-    node->MBR = rect;
-    node->isLeaf = true;
-    return node;
-}
-// Función que agrupa M nodos en un nodo padre
-Node *makeParent(vector<Node *> children){
-    Node *node = new Node;
-    node->isLeaf = false;
-    node->children = children;
-
-    // Se calcula el rectángulo que contiene a todos los hijos
-    int x_chiquito = children[0]->MBR.x1; // pivote
-    int x_grande = children[0]->MBR.x2;
-    int y_chiquito = children[0]->MBR.y1;
-    int y_grande = children[0]->MBR.y2;
-    for (int i = 0; i < children.size(); i++){
-
-        if (children[i]->MBR.x1 < x_chiquito)
-            x_chiquito = children[i]->MBR.x1;
-
-        if (children[i]->MBR.x2 > x_grande)
-            x_grande = children[i]->MBR.x2;
-
-        if (children[i]->MBR.y1 < y_chiquito)
-            y_chiquito = children[i]->MBR.y1;
-
-        if (children[i]->MBR.y2 > y_grande)
-            y_grande = children[i]->MBR.y2;
-    }
-
-    Rectangle rect = {x_chiquito, y_chiquito, x_grande, y_grande};
-    node->MBR = rect;
-    return node;
-}
-
-// Función que crea hojas a partir de un vector de rectángulos que primero ordena
-vector<Node *> makeLeaves(vector<Rectangle> rects){
+vector<Node *> makeLeavesH(vector<Rectangle> rects){
     vector<Node *> leaves;
     ordenarRectangulosHilbert(rects);
     for (int i = 0; i < rects.size(); i++){
@@ -133,8 +53,8 @@ vector<Node *> makeLeaves(vector<Rectangle> rects){
     }
     return leaves;
 }
-// Función que recibe un vector de nodos y hace grupos
-RTree makeGroups(vector<Node *> children, int M){
+RTree makeGroupsH(vector<Node *> children, int M, int factor, int nivel){
+    string nombre = "binHilbert/groupsHT" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
     vector<Node *> grupo; //
     if (children.size() == 1){
         RTree rtree = RTree();
@@ -152,24 +72,34 @@ RTree makeGroups(vector<Node *> children, int M){
             grupito.push_back(children[index]);
         }
         Node *node = makeParent(grupito);
-
         grupo.push_back(node);
-        cout << "Nodo grupito: " << node->MBR.x1 << ", " << node->MBR.x2 << endl;
-        for (int k = 0; k < grupito.size(); k++){
-            cout << "Nodo hoja: " << grupito[k]->MBR.x1 << ", " << grupito[k]->MBR.x2 << endl;
-        }
         grupito.clear();
     }
-    return makeGroups(grupo, M);
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
+    }
+    for (int i = 0; i < grupo.size(); i++){
+        fwrite(grupo[i], sizeof(Node), 1, arch);
+    }
+    fclose(arch);
+    return makeGroupsH(grupo, M, factor, nivel-1);
 }
+RTree HilbertRTree(vector<Rectangle> rects, int M, int factor){
+    vector<Node *> leaves = makeLeaves(rects);
+    int nivel = ceil((log10(pow(2,  factor)) / log10(M))) ;
+    string nombre = "binHilbert/groupsHT" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
 
-
-
-void test(){
-
-}
-int main(){
-    //test();
-    testHilbert();
-    return 0;
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
+    }
+    for (int i = 0; i < leaves.size(); i++){
+        fwrite(leaves[i], sizeof(Node), 1, arch);
+    }
+    fclose(arch);
+    RTree rtree = makeGroupsH(leaves, M, factor, nivel);
+    return rtree;
 }

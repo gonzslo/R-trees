@@ -19,18 +19,18 @@ using namespace std;
  * y queremos encontrar el rectángulo de área mínima que los contiene a todos. */
 
 // Ordena rectangulos/puntos segun su coordenada X
-void ordenarRectangulosX(vector<Rectangle> &rects){
-    sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        float mean_a = (a.x1 + a.x2) / 2.0f;
-        float mean_b = (b.x1 + b.x2) / 2.0f;
+void ordenarNodosX(vector<Node *> &rects){
+    sort(rects.begin(), rects.end(), [](const Node *a, const Node *b){
+        float mean_a = (a->MBR.x1 + a->MBR.x2) / 2.0f;
+        float mean_b = (b->MBR.x1 + b->MBR.x2) / 2.0f;
         return mean_a < mean_b; });
 }
 
 // Ordena rectangulos/puntos segun su coordenada Y
-void ordenarRectangulosY(vector<Rectangle> &rects){
-    sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        float mean_a = (a.y1 + a.y2) / 2.0f;
-        float mean_b = (b.y1 + b.y2) / 2.0f;
+void ordenarNodosY(vector<Node *> &rects){
+    sort(rects.begin(), rects.end(), [](const Node *a, const Node *b){
+        float mean_a = (a->MBR.y1 + a->MBR.y2) / 2.0f;
+        float mean_b = (b->MBR.y1 + b->MBR.y2) / 2.0f;
         return mean_a < mean_b; });
 }
 
@@ -74,9 +74,8 @@ Node *makeParent(vector<Node *> children){
 }
 
 // Función que crea hojas a partir de un vector de rectángulos que primero ordena la coordenada Y
-vector<Node *> makeLeavesX(vector<Rectangle> rects){
+vector<Node *> makeLeavesNormal(vector<Rectangle> rects){
     vector<Node *> leaves;
-    ordenarRectangulosX(rects);
     for (int i = 0; i < rects.size(); i++){
         Node *node = makeLeaf(rects[i]);
         leaves.push_back(node);
@@ -85,31 +84,21 @@ vector<Node *> makeLeavesX(vector<Rectangle> rects){
 }
 
 // Función que crea hojas a partir de un vector de rectángulos que primero ordena la coordenada Y
-vector<Node *> makeLeavesY(vector<Rectangle> rects){
+vector<Node *> makeLeavesY(vector<Node *> rects){
     vector<Node *> leaves;
-    ordenarRectangulosY(rects);
+    ordenarNodosY(rects);
     for (int i = 0; i < rects.size(); i++){
-        Node *node = makeLeaf(rects[i]);
-        leaves.push_back(node);
+        leaves.push_back(rects[i]);
     }
     return leaves;
 }
 
-// Función que convierte un vector de nodos en un vector de puntos tomando su MBR
-vector<Rectangle> makePoints(vector<Node *> leaves){
-    vector<Rectangle> rectangles;
-    for (int i = 0; i < leaves.size(); i++){
-        Rectangle rectangle = leaves[i]->MBR;
-        rectangles.push_back(rectangle);
-    }
-    return rectangles;
-}
-
 // Función que recibe un vector de puntos y hace grupos de tamaño sqrt(n/M)
-vector<vector<Rectangle>> makeXGroups(vector<Rectangle> points, int M){
-    vector<vector<Rectangle>> grupo; // grupo es vector de vectores de puntos
+vector<vector<Node *>> makeXGroups(vector<Node *> points, int M){
+    ordenarNodosX(points); // Se ordenan los puntos segun su coordenada X
+    vector<vector<Node *>> grupo; // grupo es vector de vectores de puntos
     for (int i = 0; i < (int)ceil(sqrt((double)points.size() / M)); i++){
-        vector<Rectangle> grupito; // grupito es vector de puntos
+        vector<Node *> grupito; // grupito es vector de puntos
         for (int j = 0; j < (int)ceil(sqrt((double)points.size() * M)); j++){
             int index = i * (int)ceil(sqrt((double)points.size() * M)) + j;
             if (index >= points.size()){
@@ -124,14 +113,13 @@ vector<vector<Rectangle>> makeXGroups(vector<Rectangle> points, int M){
 }
 
 // Función que recibe un vector vectores de puntos y hace sqrt(n/M) grupos de tamaño M
-vector<Node *> makeYGroups(vector<vector<Rectangle>> XGroups, int M, int factor, int nivel){
-    string nombre = "groupsSTR" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
+vector<Node *> makeYGroups(vector<vector<Node *>> XGroups, int M){
     vector<Node *> grupo; // este grupo es vector de nodos
     for (int i = 0; i < XGroups.size(); i++){ // hay que crear un rectangulo que contenga los puntos
         vector<Node *> points_leaves = makeLeavesY(XGroups[i]); // convertir puntos en hojas
         vector<Node *> grupito; // grupito es vector de nodos
         for (int j = 0; j < (int)ceil((double)XGroups[i].size()/M); j++) { // sqrt(n/M) nodos
-            for(int k = 0; k < M; k++){
+            for(int k = 0; k < M; k++) {
                 int index = j * M + k;
                 if (index >= XGroups[i].size()){
                     break;
@@ -143,98 +131,54 @@ vector<Node *> makeYGroups(vector<vector<Rectangle>> XGroups, int M, int factor,
             grupito.clear();
         }
     }
-    FILE *arch = fopen(nombre.c_str(), "wb");
-    if (arch == NULL){
-        std::cout << "Error al abrir el archivo" << std::endl;
-        return;
-    }
-    for (int i = 0; i < grupo.size(); i++){
-        fwrite(grupo[i], sizeof(Node), 1, arch);
-    }
     return grupo; // vector con todos los MBR que contienen a los puntos (nodos)
 }
 
-// Función Sort-Tile-Recursive que construye un R-tree
-RTree SortTileRecursive(vector<Rectangle> points, int M, int factor) {
-    // Convertimos los puntos iniciales en hojas
-    vector<Node *> leaves = makeLeaves(points);
-    // Creamos los archivos con las hojas
-    string nombre = "leavesSTR" + to_string(factor) + ".bin";
-    FILE *arch = fopen(nombre.c_str(), "wb");
-    if (arch == NULL){
-        std::cout << "Error al abrir el archivo" << std::endl;
-        return RTree();
-    }
-    for (int i = 0; i < leaves.size(); i++){
-        fwrite(leaves[i], sizeof(Node), 1, arch);
-    }
-    int nivel = 0;
-    int result = ceil((log10(pow(2,  nivel + 10)) / log10(1024)));
-    // Se ordenan los puntos segun su coordenada X
-    ordenarRectangulosX(points);
-    // Se hacen sqrt(n/M) grupos
-    vector<vector<Rectangle>> XGroups = makeXGroups(points, M);
-    // Ordenar los puntos de cada grupo según su coordenada Y
-    for (int i = 0; i < XGroups.size(); i++){
-        ordenarRectangulosY(XGroups[i]); // Ordena la coordenada Y en cada grupito
-    }
-    // Se hacen M grupos dentro de cada XGroup
-    leaves = makeYGroups(XGroups, M, factor, result); // Recién en este punto se tienen hojas
-    fclose(arch);
+RTree makeGroupsRecursive(vector<Node *> leaves, int M, int factor, int nivel) {
+    string nombre = "binNX/groupsNX" + to_string(factor) +"Nivel" + to_string(nivel) + ".bin";
     // Recursión del árbol (caso base)
-    if (leaves.size() == 1){
+    if (leaves.size() == 1) {
         RTree rtree = RTree();
         rtree.hijos = leaves;
         rtree.root = leaves[0];
         return rtree;
     }
-    vector<Rectangle> leaf_points = makePoints(leaves); // Transformamos las hojas a puntos para hacer recursión
-    // Se llama recursivamente a la función
-    return SortTileRecursive(leaf_points, M, factor);
+    // Se ordenan los puntos segun su coordenada X
+    // y se hacen sqrt(n/M) grupos
+    vector<vector<Node *>> XGroups = makeXGroups(leaves, M);
+    // Se ordenan los puntos de cada grupo según su coordenada Y
+    // y se hacen M grupos dentro de cada XGroup
+    vector<Node *> new_leaves = makeYGroups(XGroups, M); // Recién en este punto se tienen hojas
+    // Archivos:
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
+    }
+    for (int i = 0; i < new_leaves.size(); i++){
+        fwrite(new_leaves[i], sizeof(Node), 1, arch);
+    }
+    fclose(arch);
+    return makeGroupsRecursive(new_leaves, M, factor, nivel-1);
 }
 
-/*
-//Main que genera aleatoriamente 6 rectángulos en un plano de 20x20 y los agrupa en un R-tree
-//utiliza include random
-int main() {
-    random_device rd;
-    mt19937 eng(rd());
-    uniform_int_distribution<> distr(0, 20);
-    //Se crea un vector de rectángulos
-    vector<Rectangle> points;
-    //Se crean 6 puntos aleatorios
-    for (int i = 0; i < 60; i++) {
-        int x = distr(eng);
-        int y = distr(eng);
-        Rectangle rect = {x, y, x, y};
-        points.push_back(rect);
-        cout << "Rectangulo " << i+1 << ": " << x << ", " << y << endl;
-
+// Función Sort-Tile-Recursive que construye un R-tree
+RTree SortTileRecursive(vector<Rectangle> points, int M, int factor) {
+    // Transforma los puntos en hojas
+    vector<Node *> leaves = makeLeavesNormal(points);
+    // Escribir el arbol en archivos binarios
+    int nivel = ceil((log10(pow(2,  factor)) / log10(1024))) ;
+    string nombre = "binSTR/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
+    FILE *arch = fopen(nombre.c_str(), "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return RTree();
     }
-    // Se ordena la coordenada x de los puntos 
-    ordenarRectangulosX(points);
-    // Agruparlos en sqrt(n/M) grupos según su coordenada X
-    vector<vector<Rectangle>> XGroups = makeXGroups(points, 4);
-    for (int k = 0; k < XGroups.size(); k++){
-        cout << "Grupo " << k+1 << ": "<< endl;
-        for(int i = 0; i < XGroups[k].size(); i++) {
-            cout << "Punto " << i+1 << ": " << XGroups[k][i].x1 << ", " << XGroups[k][i].y1 << endl;
-        }
+    for (int i = 0; i < leaves.size(); i++){
+        fwrite(leaves[i], sizeof(Node), 1, arch);
     }
-    // Ordenar los puntos de cada grupo según su coordenada Y
-    for (int i = 0; i < XGroups.size(); i++){
-        ordenarRectangulosY(XGroups[i]); // Ordena la coordenada Y en cada grupito
-    }
-    // Se hacen sqrt(n/M) grupos de tamaño M dentro de cada XGroup
-    vector<Node *> leaves = makeYGroups(XGroups, 4); // Recién en este punto se tienen n/M nodos
-    for (int k = 0; k < leaves.size(); k++){
-        cout << "Hoja " << k+1 << ": (" << leaves[k]->MBR.x1 << ", " << leaves[k]->MBR.y1 << ") (" 
-        << leaves[k]->MBR.x2 << ", " << leaves[k]->MBR.y2 << ")" << endl;
-    }
-    // Se repite recursivamente
-    RTree rtree = SortTileRecursive(makePoints(leaves), 4);
-    cout << "Nodo raiz: (" << rtree.root->MBR.x1 << ", " << rtree.root->MBR.y1 << ") (" 
-        << rtree.root->MBR.x2 << ", " << rtree.root->MBR.y2 << ")" << endl;
-    return 0;
+    fclose(arch);
+    // Se llama hacen grupos recursivamente
+    RTree rtree = makeGroupsRecursive(leaves, M);
+    return rtree;
 }
-*/

@@ -1,6 +1,7 @@
 #include "Structures.hpp"
 using namespace std;
 
+
 // Función que crea rectángulos aleatorios
 vector<Rectangle> createRandomRectangles(int n){
     vector<Rectangle> rects;
@@ -48,7 +49,9 @@ int main(){
     //Crea rectángulos y hace hojas desde 2^10 hasta 2^25
     for (int i = 10; i<=25; i++){
         vector<Rectangle> rects = createRandomRectangles(i);
-        RTree rtree = nearestX(rects, 1024, i);
+        //RTree rtree1 = nearestX(rects, 1024, i);
+        // RTree rtree2 = HilbertRTree(rects, 1024, i);
+        RTree rtree3 = SortTileRecursive(rects, 1024, i);
         
     }
     return 0;
