@@ -11,7 +11,7 @@ vector<Rectangle> createRandomRectangles(int n){
     //Valores aleatorios entre 0 y 500mil
     uniform_int_distribution<> distr1(0, 500000);
     //El tamaño de los lados de los rectángulos es aleatorio entre 0 y 100
-    uniform_int_distribution<> distr2(0, 500000);
+    uniform_int_distribution<> distr2(0, 100);
 
     // //Valores aleatorios entre 0 y 20
     // uniform_int_distribution<> distr1(0, 100);
@@ -49,9 +49,9 @@ int main(){
     //Crea rectángulos y hace hojas desde 2^10 hasta 2^25
     for (int i = 10; i<=25; i++){
         vector<Rectangle> rects = createRandomRectangles(i);
-        //RTree rtree1 = nearestX(rects, 1024, i);
+        RTree rtree1 = nearestX(rects, 1024, i);
         // RTree rtree2 = HilbertRTree(rects, 1024, i);
-        RTree rtree3 = SortTileRecursive(rects, 1024, i);
+        //RTree rtree3 = SortTileRecursive(rects, 1024, i);
     }
     return 0;
 }

@@ -402,3 +402,6 @@ main.py
 rtree.bin
 *.bin
 *.exe
+ArchivoEscribir.exe
+ArchivoLeer.exe
+resultados.txt
