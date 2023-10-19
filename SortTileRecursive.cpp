@@ -179,6 +179,6 @@ RTree SortTileRecursive(vector<Rectangle> points, int M, int factor) {
     }
     fclose(arch);
     // Se llama hacen grupos recursivamente
-    RTree rtree = makeGroupsRecursive(leaves, M);
+    RTree rtree = makeGroupsRecursive(leaves, M, factor, nivel);
     return rtree;
 }
