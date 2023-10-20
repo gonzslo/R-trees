@@ -109,7 +109,7 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M) {
 }
 
 int main(){
-    int factor = 10;
+    for (int factor = 10; factor<=25; factor++){
     int M = 1024;
     //Crea un rectángulo aleatorio entre los rangos dados
     random_device rd;
@@ -138,7 +138,6 @@ int main(){
             results << final[i].x1 << " " << final[i].y1 << " " << final[i].x2 << " " << final[i].y2 << endl;
         }
     }
-
-    
+    }
     return 0;
 }
