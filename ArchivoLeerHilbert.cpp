@@ -78,7 +78,7 @@ vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
             }
         }
         fclose(arch);
-        string filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel+1) + ".bin";
+        string filename = "binHilbert/groupsHT" +to_string(factor)+ "Nivel" + to_string(nivel+1) + ".bin";
         return searchRecursive(value, offset2, nivel+1, factor, filename, M, diskAccesses);
     }
 }
@@ -113,6 +113,9 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
 }
 
 int main(){
+    int diskAccesses;
+    int M = 1024;
+
     ofstream results("resultados.txt");
     if(results.is_open()){
 
@@ -122,46 +125,36 @@ int main(){
         }
         results << endl;
 
+        //Almacenamos en memoria el vector de rectángulos Q alojado en disco
+        vector<Rectangle> rectsQ = vector<Rectangle>();
+        FILE* arch = fopen("rectsQ.bin", "rb");
+        if (arch == NULL){
+            cout << "Error al abrir el archivo" << endl;
+            return 0;
+        }
+        for (int i = 0; i<=100; i++){
+            Rectangle rect;
+            fread(&rect, sizeof(Rectangle), 1, arch);
+            rectsQ.push_back(rect);
+        }
+        fclose(arch);
+
+
         for (int factor = 10; factor<=25; factor++){
             cout << "Búsqueda en factor " << factor << endl;
             results << factor << ",";
-            int M = 1024;
-            //Crea un rectángulo aleatorio entre los rangos dados
-            random_device rd;
-            mt19937 gen(rd());
-            uniform_int_distribution<> distr1(0, 400000);
-            uniform_int_distribution<> distr2(0, 100000);
-            int x1 = distr1(gen);
-            int y1 = distr1(gen);
-            int x2 = x1 + distr2(gen);
-            int y2 = y1 + distr2(gen);
-            if (x2>500000){
-                x2 = 500000;
-            }
-            if (y2>500000){
-                y2 = 500000;
-            }
-            Rectangle value = {x1, y1, x2, y2};
-
-            //Empezamos a contar el tiempo de búsqueda
-            //Abre el archivo de rectsQ y los imprime
-            FILE* arch = fopen("rectsQ.bin", "rb");
-            if (arch == NULL){
-                cout << "Error al abrir el archivo" << endl;
-                return 0;
-            }
+            
+            //Para obtener todos los resultados y no morir en el intento, se recomienda leer los rectángulos de 10 en 10 por cada corrida,
+            //y salvar los resultados. Así la recursión no sobresatura la ram
             for (int i = 0; i<=100; i++){
-                int diskAccesses = 0;
-                Rectangle rect;
-                fread(&rect, sizeof(Rectangle), 1, arch);
+                diskAccesses = 0;
                 auto start = chrono::high_resolution_clock::now();
-                vector<Rectangle> final = search(value, factor, M, diskAccesses);
+                search(rectsQ[i], factor, M, diskAccesses);
                 auto stop = chrono::high_resolution_clock::now();
                 auto tiempofinal = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
                 results << tiempofinal << "," << diskAccesses << ",";
 
             }
-            fclose(arch);
             results << endl;
 
         }
