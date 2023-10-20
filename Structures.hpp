@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 
@@ -232,7 +233,7 @@ int xy2d (int n, int x, int y) {
 }
 void ordenarRectangulosHilbert(vector<Rectangle> &rects){
     sort(rects.begin(), rects.end(), [](const Rectangle &a, const Rectangle &b){
-        int n = 4;
+        int n = 6;
         float x1 = (a.x2+a.x1)/2.0f;
         float y1 = (a.y2+a.y1)/2.0f;
         float x2 = (b.x2+b.x1)/2.0f;
@@ -400,7 +401,7 @@ RTree SortTileRecursive(vector<Rectangle> points, int M, int factor) {
     // Transforma los puntos en hojas
     vector<Node *> leaves = makeLeavesNormal(points);
     // Escribir el arbol en archivos binarios
-    int nivel = ceil((log10(pow(2,  factor)) / log10(1024))) ;
+    int nivel = ceil((log10(pow(2,  factor)) / log10(M))) ;
     string nombre = "binSTR/groupsSTR" +to_string(factor)+ "Nivel" + to_string(nivel + 1) + ".bin";
     FILE *arch = fopen(nombre.c_str(), "wb");
     if (arch == NULL){
