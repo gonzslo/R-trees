@@ -1,76 +1,150 @@
 #include "Structures.hpp"
-using namespace std;
+#include<chrono>
 #include <fstream>
+using namespace std;
 
 bool intersects(const Rectangle& rect1, const Rectangle& rect2) {
     // Verifica si dos rectángulos se intersectan.
-    bool x_overlap = (rect1.x1 <= rect2.x2 && rect1.x2 >= rect2.x1) || (rect2.x1 <= rect1.x2 && rect2.x2 >= rect1.x1);
-    bool y_overlap = (rect1.y1 <= rect2.y2 && rect1.y2 >= rect2.y1) || (rect2.y1 <= rect1.y2 && rect2.y2 >= rect1.y1);
-
-    return x_overlap && y_overlap;
-}
-void searchRecursive(Node* currentNode, const Rectangle& value,
-                     vector<Rectangle>& result, int nivel, int factor,
-                     string filename, FILE *file) {
-
-    if(filename == "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin") { // Si estamos en el último nivel (en las hojas del arbol)
-        result.push_back(currentNode->MBR); // Caso base porque estamos al final
+    if (rect1.x1 > rect2.x2 || rect2.x1 > rect1.x2) {
+        return false;
     }
-    else { // Recursión
-       
-         // Hay que cambiar la iteración por búsqueda en el siguiente archivo en el puntero del hijo del nodo MBR que intersecta
-        if(intersects(currentNode->MBR, value)) { // Avanzamos en el nivel desde el primer MBR que intersecta hasta el último
-            
-        } else {
-            fseek(file, sizeof(Node), SEEK_CUR); // Si el nodo intersecta, vamos al puntero hacia el hijo que está en el siguiente archivo y buscamos recursivamente en el
-            searchRecursive(currentNode, value, result, nivel+1, factor, filename, file);
+    if (rect1.y1 > rect2.y2 || rect2.y1 > rect1.y2) {
+        return false;
+    }
+    return true;
+}
+int nodosporleerF(int factor, int nivel, int M) {
+    nivel--;
+    int nodosporleer=pow(2,nivel);
+    if (nivel>=1){
+        nodosporleer=pow(2,factor%10+10*(nivel-1));
+        if(factor%10==0){
+            nodosporleer=pow(2,10*nivel);
         }
+    }
+    return nodosporleer;
+}
+int nodosFuturosF(int factor, int nivel, int M){
+    return nodosporleerF(factor, nivel+1, M)/nodosporleerF(factor, nivel, M);
+}
+
+vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
+                                 int nivel, int factor, string filename, int M, int& diskAccesses) {
+
+    int nivelfinal = ceil((log10(pow(2,  factor)) / log10(M)))+1;
+    vector<Rectangle> tempResult = vector<Rectangle>();
+    vector<bool> offset2 = vector<bool>();
+
+    if(nivel == nivelfinal) { // Si estamos en el último nivel (en las hojas del arbol)
+        FILE* arch = fopen(filename.c_str(), "rb");
+        if (arch == NULL){
+            cout << "Error al abrir el archivo" << endl;
+            return tempResult;
+        }
+        for (int i = 0; i < pow(2, factor); i++){
+            Node *node = new Node;
+            fread(node, sizeof(Node), 1, arch);
+            diskAccesses++;
+            if(intersects(node->MBR, value)){
+                tempResult.push_back(node->MBR);
+            }
+                
+        }
+        fclose(arch);
+        return tempResult; // Caso base porque estamos al final
+    }
+    else {//Inspecciona si los mbr de cada nodo intersectan con value. Si es así, se busca recursivamente en el siguiente nivel
+        FILE* arch = fopen(filename.c_str(), "rb");
+        if (arch == NULL){
+            cout << "Error al abrir el archivo" << endl;
+            return tempResult;
+        }
+        int nodosFuturos=nodosFuturosF(factor, nivel, M);
+        for (int i = 0; i <= offset.size(); i++){
+            Node *node = new Node;
+            if (offset[i]==false){
+                fseek(arch, sizeof(Node)*nodosFuturos, SEEK_CUR);}
+            else{
+                for(int j=0; j<nodosFuturos; j++){
+                    fread(node, sizeof(Node), 1, arch);
+                    diskAccesses++;
+                    if(intersects(node->MBR, value)){
+                        offset2.push_back(true);
+                    }
+                    else{
+                        offset2.push_back(false);
+                    }
+                }
+            }
+        }
+        fclose(arch);
+        string filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel+1) + ".bin";
+        return searchRecursive(value, offset2, nivel+1, factor, filename, M, diskAccesses);
     }
 }
 // Búsqueda: retorna un vector de rectangulos que intersectan con value
-vector<Rectangle> search(Node* node, const Rectangle& value, int nivel, int factor, string filename, FILE *file) {
-    vector<Rectangle> result;
-    if(!intersects(node->MBR, value))
-        return vector<Rectangle>();
-    searchRecursive(node, value, result, nivel, factor, filename, file);
+vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAccesses) {
+    vector<Rectangle> result = vector<Rectangle>();
+    vector<bool> offset = vector<bool>();
+    int nivel = 1;
+    string filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
+    FILE* arch = fopen(filename.c_str(), "rb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return result;
+    }
+    Node* node = new Node;
+    fread(node, sizeof(Node), 1, arch);
+    diskAccesses++;
+    fclose(arch);
+
+
+    //Si el MBR de la raíz intersecta con el rectángulo, se busca recursivamente para añadir los nodos que intersectan a result
+    if(intersects(node->MBR, value))
+        cout << "intersecta"<< endl;
+        nivel++;
+        filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
+        offset.push_back(true);
+        vector<Rectangle> result2 = searchRecursive(value, offset, nivel, factor, filename, M, diskAccesses);
+        for (int i = 0; i < result2.size(); i++){
+            result.push_back(result2[i]);
+        }
+        
     return result;
-}
+}34156988
 
 int main(){
-    //leer todos los arboles de un factor
-    Rectangle value = {1,2,3,4}; //Solo para probar
+    for (int factor = 25; factor<=25; factor++){
+    int M = 1024;
+    int diskAccesses = 0;
+    //Crea un rectángulo aleatorio entre los rangos dados
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distr1(0, 400000);
+    uniform_int_distribution<> distr2(0, 100000);
+    int x1 = distr1(gen);
+    int y1 = distr1(gen);
+    int x2 = x1 + distr2(gen);
+    int y2 = y1 + distr2(gen);
+    if (x2>500000){
+        x2 = 500000;
+    }
+    if (y2>500000){
+        y2 = 500000;
+    }
+    Rectangle value = {x1, y1, x2, y2};
+    cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
+
+
+    vector<Rectangle> final = search(value, factor, M, diskAccesses);
+
     ofstream results("resultados.txt");
     if(results.is_open()){
-        for(int factor=10; factor<=10; factor++){
-            int nivel = ceil((log10(pow(2,  factor)) / log10(1024))) ;
-            for(int i = 0; i<=nivel; i++){
-                //Abrir el archivo que contiene al nodo
-                string filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(i+1) + ".bin";
-                cout << filename << endl;
-                results << filename << endl;
-                FILE* arch = fopen(filename.c_str(), "rb");
-                if (arch == NULL){
-                    cout << "Error al abrir el archivo" << endl;
-                    return 1;
-                }
-                int nodosporleer=pow(2,i);
-                if (i>=1){
-                    nodosporleer=pow(2,factor%10+10*(i-1));
-                    if(factor%10==0){
-                        nodosporleer=pow(2,10*i);
-                    }
-                }
-                results << "nodos por leer corregido "<< nodosporleer << endl;
-                cout << "nodos por leer corregido "<< nodosporleer << endl;
-                for (int i=0; i<nodosporleer; i++){ 
-                    Node *node = new Node;
-                    fread(node, sizeof(Node), 1, arch);
-
-                }
-                fclose(arch);
-            }
+        for (int i = 0; i < final.size(); i++){
+            results << final[i].x1 << " " << final[i].y1 << " " << final[i].x2 << " " << final[i].y2 << endl;
         }
+    }
+    cout << diskAccesses << endl;
     }
     return 0;
 }
-
