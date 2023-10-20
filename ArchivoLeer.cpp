@@ -111,7 +111,7 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
         }
         
     return result;
-}34156988
+}
 
 int main(){
     for (int factor = 25; factor<=25; factor++){
