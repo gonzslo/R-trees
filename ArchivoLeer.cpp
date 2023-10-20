@@ -150,7 +150,7 @@ int main(){
                 cout << "Error al abrir el archivo" << endl;
                 return 0;
             }
-            for (int i = 0; i< 100; i++){
+            for (int i = 0; i<=100; i++){
                 int diskAccesses = 0;
                 Rectangle rect;
                 fread(&rect, sizeof(Rectangle), 1, arch);
