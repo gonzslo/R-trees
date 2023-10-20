@@ -122,7 +122,7 @@ int main(){
         }
         results << endl;
 
-        for (int factor = 21; factor<=25; factor++){
+        for (int factor = 10; factor<=25; factor++){
             cout << "Búsqueda en factor " << factor << endl;
             results << factor << ",";
             int M = 1024;
