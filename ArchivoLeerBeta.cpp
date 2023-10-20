@@ -103,7 +103,6 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M) {
         cout << "intersecta"<< endl;
         nivel++;
         filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
-        vector<bool> offset = vector<bool>();
         offset.push_back(true);
         vector<Rectangle> result2 = searchRecursive(value, offset, nivel, factor, filename, M);
         for (int i = 0; i < result2.size(); i++){
