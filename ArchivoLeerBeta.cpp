@@ -27,8 +27,6 @@ int nodosFuturosF(int factor, int nivel, int M){
     return nodosporleerF(factor, nivel+1, M)/nodosporleerF(factor, nivel, M);
 }
 
-
-
 vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
                                  int nivel, int factor, string filename, int M) {
 
@@ -51,11 +49,9 @@ vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
                 
         }
         fclose(arch);
-        cout << "terminamo" << endl;
         return tempResult; // Caso base porque estamos al final
     }
-    else { // Recursión
-        //Inspecciona si los mbr de cada nodo intersectan con value. Si es así, se busca recursivamente en el siguiente nivel
+    else {//Inspecciona si los mbr de cada nodo intersectan con value. Si es así, se busca recursivamente en el siguiente nivel
         FILE* arch = fopen(filename.c_str(), "rb");
         if (arch == NULL){
             cout << "Error al abrir el archivo" << endl;
