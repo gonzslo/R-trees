@@ -154,8 +154,6 @@ int main(){
                 int diskAccesses = 0;
                 Rectangle rect;
                 fread(&rect, sizeof(Rectangle), 1, arch);
-                cout << "Rectangulo " << i + 1 << ": " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
-
                 auto start = chrono::high_resolution_clock::now();
                 vector<Rectangle> final = search(value, factor, M, diskAccesses);
                 auto stop = chrono::high_resolution_clock::now();
