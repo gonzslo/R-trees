@@ -12,7 +12,6 @@ bool intersects(const Rectangle& rect1, const Rectangle& rect2) {
     }
     return true;
 }
-
 int nodosporleerF(int factor, int nivel, int M) {
     nivel--;
     int nodosporleer=pow(2,nivel);
@@ -24,10 +23,15 @@ int nodosporleerF(int factor, int nivel, int M) {
     }
     return nodosporleer;
 }
+int nodosFuturosF(int factor, int nivel, int M){
+    return nodosporleerF(factor, nivel+1, M)/nodosporleerF(factor, nivel, M);
+}
+
+
 
 vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
                                  int nivel, int factor, string filename, int M) {
-                                    
+
     int nivelfinal = ceil((log10(pow(2,  factor)) / log10(M)))+1;
     vector<Rectangle> tempResult = vector<Rectangle>();
     vector<bool> offset2 = vector<bool>();
@@ -41,9 +45,9 @@ vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
         for (int i = 0; i < pow(2, factor); i++){
             Node *node = new Node;
             fread(node, sizeof(Node), 1, arch);
-            if(intersects(node->MBR, value))
+            if(intersects(node->MBR, value)){
                 tempResult.push_back(node->MBR);
-                tempResult.push_back(node->MBR);
+            }
                 
         }
         fclose(arch);
@@ -57,22 +61,26 @@ vector<Rectangle>searchRecursive(const Rectangle& value, vector<bool> offset,
             cout << "Error al abrir el archivo" << endl;
             return tempResult;
         }
-        int nodosporleer = nodosporleerF(factor, nivel, M);
-        cout << "Nodos por leer: " << nodosporleer << " Nivel: " << nivel <<endl;
-        for (int i = 0; i < nodosporleer; i++){
+        int nodosFuturos=nodosFuturosF(factor, nivel, M);
+        for (int i = 0; i <= offset.size(); i++){
             Node *node = new Node;
-            fread(node, sizeof(Node), 1, arch);
-            if(intersects(node->MBR, value)){
-                offset2.push_back(true);
-                cout << "Intersecta" << endl;
-            }
+            if (offset[i]==false){
+                fseek(arch, sizeof(Node)*nodosFuturos, SEEK_CUR);}
             else{
-                offset2.push_back(false);
+                for(int j=0; j<nodosFuturos; j++){
+                    fread(node, sizeof(Node), 1, arch);
+                    if(intersects(node->MBR, value)){
+                        offset2.push_back(true);
+                    }
+                    else{
+                        offset2.push_back(false);
+                    }
+                }
             }
         }
-
+        fclose(arch);
         string filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel+1) + ".bin";
-        return searchRecursive(value, offset, nivel+1, factor, filename, M);
+        return searchRecursive(value, offset2, nivel+1, factor, filename, M);
     }
 }
 // Búsqueda: retorna un vector de rectangulos que intersectan con value
@@ -93,9 +101,10 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M) {
     //Si el MBR de la raíz intersecta con el rectángulo, se busca recursivamente para añadir los nodos que intersectan a result
     if(intersects(node->MBR, value))
         cout << "intersecta"<< endl;
-        result.push_back(node->MBR);
         nivel++;
         filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
+        vector<bool> offset = vector<bool>();
+        offset.push_back(true);
         vector<Rectangle> result2 = searchRecursive(value, offset, nivel, factor, filename, M);
         for (int i = 0; i < result2.size(); i++){
             result.push_back(result2[i]);
@@ -105,36 +114,37 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M) {
 }
 
 int main(){
+    int factor = 10;
+    int M = 1024;
+    //Crea un rectángulo aleatorio entre los rangos dados
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distr1(0, 400000);
+    uniform_int_distribution<> distr2(0, 100000);
+    int x1 = distr1(gen);
+    int y1 = distr1(gen);
+    int x2 = x1 + distr2(gen);
+    int y2 = y1 + distr2(gen);
+    if (x2>500000){
+        x2 = 500000;
+    }
+    if (y2>500000){
+        y2 = 500000;
+    }
+    Rectangle value = {x1, y1, x2, y2};
+    cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
+
+
+    vector<Rectangle> final = search(value, factor, M);
+
     ofstream results("resultados.txt");
     if(results.is_open()){
-        int factor = 10;
-        int M = 1024;
-        //Crea un rectángulo aleatorio entre los rangos dados
-        random_device rd;
-        mt19937 gen(rd());
-        uniform_int_distribution<> distr1(0, 500000);
-        uniform_int_distribution<> distr2(0, 100);
-        int x1 = distr1(gen);
-        int y1 = distr1(gen);
-        int x2 = x1 + distr2(gen);
-        int y2 = y1 + distr2(gen);
-        if (x2>500000){
-            x2 = 500000;
-        }
-        if (y2>500000){
-            y2 = 500000;
-        }
-        Rectangle value = {x1, y1, x2, y2};
-        cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
-
-
-        vector<Rectangle> final = search(value, factor, M);
         for (int i = 0; i < final.size(); i++){
-            cout << final[i].x1 << " " << final[i].y1 << " " << final[i].x2 << " " << final[i].y2 << endl;
             results << final[i].x1 << " " << final[i].y1 << " " << final[i].x2 << " " << final[i].y2 << endl;
         }
-
     }
+
+    
     return 0;
 }
     // //leer todos los arboles de un factor
