@@ -164,9 +164,9 @@ int main(){
                 cout << diskAccesses << endl;
                 cout << "Tiempo"<< factor << ": " <<tiempofinal<< " ms" << endl;
                 results << tiempofinal << ",";
-                results << endl;
 
             }
+            results << endl;
 
         }
     }
