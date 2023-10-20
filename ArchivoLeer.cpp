@@ -119,13 +119,13 @@ int main(){
         results << "Arbol,";
         for (int k=0; k<=100; k++){
             results << "Tiempo "<< k << ",";
+            results << "Disk Accesses "<< k << ",";
         }
         results << endl;
 
         for (int factor = 10; factor<=25; factor++){
             results << factor << ",";
             int M = 1024;
-            int diskAccesses = 0;
             //Crea un rectángulo aleatorio entre los rangos dados
             random_device rd;
             mt19937 gen(rd());
@@ -151,6 +151,7 @@ int main(){
                 return 0;
             }
             for (int i = 0; i< 100; i++){
+                int diskAccesses = 0;
                 Rectangle rect;
                 fread(&rect, sizeof(Rectangle), 1, arch);
                 cout << "Rectangulo " << i + 1 << ": " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
@@ -160,6 +161,7 @@ int main(){
                 auto stop = chrono::high_resolution_clock::now();
                 auto tiempofinal = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
                 results << tiempofinal << ",";
+                results << diskAccesses << ",";
 
             }
             results << endl;
