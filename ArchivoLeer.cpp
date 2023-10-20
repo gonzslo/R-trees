@@ -114,40 +114,61 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
 }
 
 int main(){
-    for (int factor = 10; factor<=25; factor++){
-    int M = 1024;
-    int diskAccesses = 0;
-    //Crea un rectángulo aleatorio entre los rangos dados
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> distr1(0, 400000);
-    uniform_int_distribution<> distr2(0, 100000);
-    int x1 = distr1(gen);
-    int y1 = distr1(gen);
-    int x2 = x1 + distr2(gen);
-    int y2 = y1 + distr2(gen);
-    if (x2>500000){
-        x2 = 500000;
-    }
-    if (y2>500000){
-        y2 = 500000;
-    }
-    Rectangle value = {x1, y1, x2, y2};
-    cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
-
-    //Empezamos a contar el tiempo de búsqueda
-    auto start = chrono::high_resolution_clock::now();
-    vector<Rectangle> final = search(value, factor, M, diskAccesses);
-    auto stop = chrono::high_resolution_clock::now();
-
     ofstream results("resultados.txt");
     if(results.is_open()){
-        for (int i = 0; i < final.size(); i++){
-            results << final[i].x1 << " " << final[i].y1 << " " << final[i].x2 << " " << final[i].y2 << endl;
+
+        results << "Arbol,";
+        for (int k=0; k<=100; k++){
+            results << "Tiempo "<< k << ",";
         }
-    }
-    cout << diskAccesses << endl;
-    cout << "Tiempo"<< factor << ": " << chrono::duration_cast<chrono::milliseconds>(stop - start).count() << " ms" << endl;
+        results << endl;
+
+        for (int factor = 10; factor<=25; factor++){
+            results << factor << ",";
+            int M = 1024;
+            int diskAccesses = 0;
+            //Crea un rectángulo aleatorio entre los rangos dados
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_int_distribution<> distr1(0, 400000);
+            uniform_int_distribution<> distr2(0, 100000);
+            int x1 = distr1(gen);
+            int y1 = distr1(gen);
+            int x2 = x1 + distr2(gen);
+            int y2 = y1 + distr2(gen);
+            if (x2>500000){
+                x2 = 500000;
+            }
+            if (y2>500000){
+                y2 = 500000;
+            }
+            Rectangle value = {x1, y1, x2, y2};
+            cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
+
+            //Empezamos a contar el tiempo de búsqueda
+            //Abre el archivo de rectsQ y los imprime
+            FILE* arch = fopen("rectsQ.bin", "rb");
+            if (arch == NULL){
+                cout << "Error al abrir el archivo" << endl;
+                return 0;
+            }
+            for (int i = 0; i< 100; i++){
+                Rectangle rect;
+                fread(&rect, sizeof(Rectangle), 1, arch);
+                cout << "Rectangulo " << i + 1 << ": " << rect.x1 << ", " << rect.x2 << " " << rect.y1 << ", " << rect.y2 << endl;
+
+                auto start = chrono::high_resolution_clock::now();
+                vector<Rectangle> final = search(value, factor, M, diskAccesses);
+                auto stop = chrono::high_resolution_clock::now();
+                auto tiempofinal = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+                cout << diskAccesses << endl;
+                cout << "Tiempo"<< factor << ": " <<tiempofinal<< " ms" << endl;
+                results << tiempofinal << ",";
+                results << endl;
+
+            }
+
+        }
     }
     return 0;
 }

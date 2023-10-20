@@ -77,16 +77,20 @@ vector<Rectangle> createRandomRectanglesQ(int n){
     return rects; 
 }
 int main(){
-    //Crea rectángulos y hace hojas desde 2^10 hasta 2^25
     //Crea rectángulos para las Q consultas
     vector<Rectangle> rectsQ = createRandomRectanglesQ(100);
     //Guardamos rectsQ en un archivo
-    ofstream file("rectsQ.txt");
-    for (int i = 0; i < rectsQ.size(); i++){
-        file << rectsQ[i].x1 << " " << rectsQ[i].y1 << " " << rectsQ[i].x2 << " " << rectsQ[i].y2 << endl;
+    FILE* arch = fopen("rectsQ.bin", "wb");
+    if (arch == NULL){
+        cout << "Error al abrir el archivo" << endl;
+        return 0;
     }
-    file.close();
-    cout << "Q listo" << endl;
+    for (int i = 0; i<rectsQ.size(); i++){
+        fwrite(&rectsQ[i], sizeof(Rectangle), 1, arch);
+    }
+    fclose(arch);
+    cout << "Archivo creado con rectángulos Q" << endl;
+
 
     for (int i = 10; i<=25; i++){
         vector<Rectangle> rects = createRandomRectangles(i);
@@ -94,5 +98,6 @@ int main(){
         RTree rtree2 = HilbertRTree(rects, 1024, i);
         RTree rtree3 = SortTileRecursive(rects, 1024, i);
     }
+    cout << "Árboles creados" << endl;
     return 0;
 }
