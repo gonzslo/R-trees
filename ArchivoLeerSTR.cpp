@@ -87,7 +87,7 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
     vector<Rectangle> result = vector<Rectangle>();
     vector<bool> offset = vector<bool>();
     int nivel = 1;
-    string filename = "binSRT/groupsSRT" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
+    string filename = "binSTR/groupsSTR" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
     FILE* arch = fopen(filename.c_str(), "rb");
     if (arch == NULL){
         cout << "Error al abrir el archivo" << endl;
@@ -102,7 +102,7 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
     //Si el MBR de la raíz intersecta con el rectángulo, se busca recursivamente para añadir los nodos que intersectan a result
     if(intersects(node->MBR, value))
         nivel++;
-        filename = "binSRT/groupsSRT" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
+        filename = "binSTR/groupsSTR" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
         offset.push_back(true);
         vector<Rectangle> result2 = searchRecursive(value, offset, nivel, factor, filename, M, diskAccesses);
         for (int i = 0; i < result2.size(); i++){
