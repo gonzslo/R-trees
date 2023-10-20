@@ -114,7 +114,7 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
 }
 
 int main(){
-    for (int factor = 25; factor<=25; factor++){
+    for (int factor = 10; factor<=25; factor++){
     int M = 1024;
     int diskAccesses = 0;
     //Crea un rectángulo aleatorio entre los rangos dados
@@ -135,8 +135,10 @@ int main(){
     Rectangle value = {x1, y1, x2, y2};
     cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
 
-
+    //Empezamos a contar el tiempo de búsqueda
+    auto start = chrono::high_resolution_clock::now();
     vector<Rectangle> final = search(value, factor, M, diskAccesses);
+    auto stop = chrono::high_resolution_clock::now();
 
     ofstream results("resultados.txt");
     if(results.is_open()){
@@ -145,6 +147,7 @@ int main(){
         }
     }
     cout << diskAccesses << endl;
+    cout << "Tiempo"<< factor << ": " << chrono::duration_cast<chrono::milliseconds>(stop - start).count() << " ms" << endl;
     }
     return 0;
 }
