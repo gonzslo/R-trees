@@ -101,7 +101,6 @@ vector<Rectangle> search(const Rectangle& value, int factor, int M, int& diskAcc
 
     //Si el MBR de la raíz intersecta con el rectángulo, se busca recursivamente para añadir los nodos que intersectan a result
     if(intersects(node->MBR, value))
-        cout << "intersecta"<< endl;
         nivel++;
         filename = "binNX/groupsNX" +to_string(factor)+ "Nivel" + to_string(nivel) + ".bin";
         offset.push_back(true);
@@ -143,7 +142,6 @@ int main(){
                 y2 = 500000;
             }
             Rectangle value = {x1, y1, x2, y2};
-            cout << "Rectángulo: " << value.x1 << " " << value.y1 << " " << value.x2 << " " << value.y2 << endl;
 
             //Empezamos a contar el tiempo de búsqueda
             //Abre el archivo de rectsQ y los imprime
@@ -161,8 +159,6 @@ int main(){
                 vector<Rectangle> final = search(value, factor, M, diskAccesses);
                 auto stop = chrono::high_resolution_clock::now();
                 auto tiempofinal = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-                cout << diskAccesses << endl;
-                cout << "Tiempo"<< factor << ": " <<tiempofinal<< " ms" << endl;
                 results << tiempofinal << ",";
 
             }
