@@ -3,6 +3,11 @@
 - Benjamín Bustos
 - Gonzalo Navarro
 
+### Estudiantes
+- Gonzalo Cisternas
+- Javiera Jiménez
+- Daniela Moraga
+
 ## Requerimientos
 Para poder ejecutar el código primero se deben seguir los pasos de [esta página](https://code.visualstudio.com/docs/cpp/config-mingw).
 
